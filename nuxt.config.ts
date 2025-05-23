@@ -38,6 +38,7 @@ export default defineNuxtConfig({
 
   css: [
     "@/assets/scss/bundle.scss",
+    "primeicons/primeicons.css",
   ],
 
   modules: [

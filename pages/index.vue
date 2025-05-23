@@ -12,100 +12,113 @@
       <div class="input-wrapper">
         <InputText
           v-model="userAnswer"
+          :invalid="isInvalid"
           :disabled="isAnswered || attemptsLeft === 0"
           @keyup.enter="submitAnswer"
         />
         <Button
-          label="Проверить"
+          label=""
           @click="submitAnswer"
           :disabled="isAnswered || attemptsLeft === 0"
-        />
+        >
+          <template #icon>
+            <i class="pi pi-check"></i>
+          </template>
+        </Button>
       </div>
 
-      <div class="result-message">
-        <div v-if="showResult">{{ resultMessage }}</div>
-      </div>
-
-      <div v-if="isAnswered || attemptsLeft === 0" class="action-buttons">
-        <Button label="Далее" @click="nextQuestion" />
+      <div class="action-buttons">
+        <Button label="Далее" @click="nextQuestion" :disabled="!isAnswered && attemptsLeft > 0" />
       </div>
     </div>
-
     <div v-else class="quiz-finished">
-      🎉 Квиз завершён! <br />
-      Ваш счёт: <strong>{{ totalScore }}</strong> из {{ riddles.length * maxPointsPerQuestion }}
+      🎉 Квест завершён! <br />
+      Ваш счёт: <strong>{{ store.score }}$</strong>
+    </div>
+
+    <div class="result-message">
+        <div :style="{visibility: showResult ? 'visible' : 'hidden'}">{{ resultMessage }}</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
+import { ref, computed } from "vue";
+import InputText from "primevue/inputtext";
+import Button from "primevue/button";
+import { PrimeIcons } from "@primevue/core/api";
+import { useMainStore } from '@/stores/main'
 
-const maxAttempts = 3
-const maxPointsPerQuestion = 3
+const maxAttempts = 3;
+const maxPointsPerQuestion = 300;
+const store = useMainStore()
 
 const riddles = [
-  { question: 'Сидит дед, во сто шуб одет. Кто это?', answer: 'лук' },
-  { question: 'Не лает, не кусает, а в дом не пускает.', answer: 'замок' },
-  { question: 'Что можно увидеть с закрытыми глазами?', answer: 'сон' }
+  { question: "Стоит трон из лезвий, но сидеть на нём — не значит править. Что это?", answer: "Железный Трон" },    
+  { question: "Красный или зелёный — в огне рождённый. Кто это?", answer: "дракон" },  
+  { question: "Льётся кровь, но не в бою — решает, кто корону возьмёт свою. Что это?", answer: "наследство" },  
+  { question: "Летит пламя, но не сжигает; рев есть, но не слышен. Кто это?", answer: "Бейлон" },  
+  { question: "Две сестры, одна корона — кто возьмёт, тот и закон. О чём речь?", answer: "Рейнира и Алисента" },  
+  { question: "Без головы, но шепчет; без языка, но правит. Кто это?", answer: "Варис" },  
+  { question: "Чёрный или белый — но всегда в огне. Что это?", answer: "Дракарис" },  
 ]
 
-const currentStep = ref(0)
-const userAnswer = ref('')
-const attemptsLeft = ref(maxAttempts)
-const currentPoints = ref(maxPointsPerQuestion)
-const totalScore = ref(0)
-const showResult = ref(false)
-const resultMessage = ref('')
-const isAnswered = ref(false)
+const currentStep = ref(0);
+const userAnswer = ref("");
+const attemptsLeft = ref(maxAttempts);
+const currentPoints = ref(maxPointsPerQuestion);
+const totalScore = ref(0);
+const showResult = ref(false);
+const resultMessage = ref("");
+const isAnswered = ref(false);
+const isInvalid = ref(false)
 
-const isFinished = computed(() => currentStep.value >= riddles.length)
-const currentRiddle = computed(() => riddles[currentStep.value] || {})
+const isFinished = computed(() => currentStep.value >= riddles.length);
+const currentRiddle = computed(() => riddles[currentStep.value] || {});
 
 function submitAnswer() {
-  if (!userAnswer.value.trim() || isAnswered.value || attemptsLeft.value <= 0) return
+  if (!userAnswer.value.trim() || isAnswered.value || attemptsLeft.value <= 0)
+    return;
 
-  const normalized = userAnswer.value.trim().toLowerCase()
-  const correct = currentRiddle.value.answer.toLowerCase()
+  const normalized = userAnswer.value.trim().toLowerCase();
+  const correct = currentRiddle.value.answer.toLowerCase();
 
   if (normalized === correct) {
-    resultMessage.value = '✅ Верно!'
-    totalScore.value += currentPoints.value
-    isAnswered.value = true
-    showResult.value = true
+    resultMessage.value = "✅ Верно!";
+    store.addPoints(currentPoints.value)
+    isAnswered.value = true;
+    showResult.value = true;
+    isInvalid.value = false
   } else {
-    attemptsLeft.value--
-    currentPoints.value--
-    userAnswer.value = ''
+    attemptsLeft.value--;
+    currentPoints.value = currentPoints.value - (maxPointsPerQuestion / 3);
+    isInvalid.value = true
 
     if (attemptsLeft.value > 0) {
-      resultMessage.value = `❌ Неверно. Осталось попыток: ${attemptsLeft.value}`
+      resultMessage.value = `❌ Неверно.\nОсталось попыток: ${attemptsLeft.value}`;
     }
 
     if (attemptsLeft.value === 0) {
-      resultMessage.value = `❌ Все попытки исчерпаны. Правильный ответ: ${currentRiddle.value.answer}`
-      isAnswered.value = true
+      resultMessage.value = `❌ Все попытки исчерпаны.\nПравильный ответ: ${currentRiddle.value.answer}`;
+      isAnswered.value = true;
     }
 
-    showResult.value = true
+    showResult.value = true;
   }
 }
 
 function nextQuestion() {
-  currentStep.value++
-  userAnswer.value = ''
-  attemptsLeft.value = maxAttempts
-  currentPoints.value = maxPointsPerQuestion
-  showResult.value = false
-  resultMessage.value = ''
-  isAnswered.value = false
+  currentStep.value++;
+  userAnswer.value = "";
+  attemptsLeft.value = maxAttempts;
+  currentPoints.value = maxPointsPerQuestion;
+  showResult.value = false;
+  resultMessage.value = "";
+  isAnswered.value = false;
 }
 </script>
 
 <style scoped lang="scss">
-
 .quiz-page {
   min-height: 100vh;
   padding: 2.4rem 1.6rem;
@@ -114,13 +127,14 @@ function nextQuestion() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2rem;
 
   .quiz-box {
     width: 100%;
     max-width: 32rem;
     background-color: #fff;
     border-radius: 1.6rem;
-    padding: 2.4rem;
+    padding: 2.4rem 2rem;
     box-shadow: 0 0.4rem 1.6rem rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
@@ -156,18 +170,20 @@ function nextQuestion() {
 
     .p-button {
       font-size: 1.6rem;
-      padding: 1rem 1.6rem;
+      padding: 1rem 2rem;
       border-radius: 1rem;
     }
   }
 
   .action-buttons {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     margin-top: 1rem;
+    width: 100%;
 
     .p-button {
       font-size: 1.6rem;
+      width: 100%;
       padding: 1rem 1.6rem;
       border-radius: 1rem;
     }
@@ -175,7 +191,9 @@ function nextQuestion() {
 
   .result-message {
     text-align: center;
+    justify-self: flex-start;
     font-size: 1.6rem;
+    height: 2rem;
     margin-top: 1.2rem;
     font-weight: 500;
   }
@@ -187,5 +205,4 @@ function nextQuestion() {
     margin-top: 2rem;
   }
 }
-
 </style>
