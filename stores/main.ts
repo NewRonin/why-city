@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 export const useMainStore = defineStore('quiz', {
   state: () => ({
     score: 0,
+    user: '',
   }),
   actions: {
     resetScore() {
@@ -11,5 +12,8 @@ export const useMainStore = defineStore('quiz', {
     addPoints(points: number) {
       this.score += points
     },
+    setUser(name: string) {
+        this.user = name
+    }
   },
 })

@@ -2,12 +2,22 @@
   <div class="login-page">
     <h1>НАЧАТЬ ИГРУ</h1>
     <div class="button-wrapper">
-      <Button label="Я участник" severity="primary" @click="navigateTo('/')" />
+      <Button label="Я участник" severity="primary" @click="enterPlayer" />
       <Button label="Я организатор" severity="secondary" outlined />
     </div>
   </div>
 </template>
 
+<script setup lang="ts">
+import { useMainStore } from '@/stores/main'
+const store = useMainStore()
+
+function enterPlayer() {
+    store.setUser('test')
+    navigateTo('/')
+}
+
+</script>
 
 <style scoped lang="scss">
 
