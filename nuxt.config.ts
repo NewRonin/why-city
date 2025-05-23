@@ -71,7 +71,10 @@ export default defineNuxtConfig({
   primevue: {
     options: {
       theme: {
-          preset: CollabPreset
+          preset: CollabPreset,
+          options: {
+              darkModeSelector: false || 'none',
+          }
       }
     },
     components: {

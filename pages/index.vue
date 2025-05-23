@@ -158,17 +158,23 @@ function nextQuestion() {
 
   .input-wrapper {
     display: flex;
+    max-width: 100%;
+    flex-flow: row nowrap;
     gap: 1.2rem;
     margin-bottom: 1.6rem;
 
     input {
-      flex: 1;
+      flex: 1 1 auto;
+      min-width: 0;
       font-size: 1.6rem;
       padding: 1rem 1.2rem;
       border-radius: 1rem;
     }
 
     .p-button {
+      flex: 0 0 auto;
+      width: 4rem;
+      height: 4rem;
       font-size: 1.6rem;
       padding: 1rem 2rem;
       border-radius: 1rem;
