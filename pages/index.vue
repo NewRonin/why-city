@@ -5,6 +5,14 @@
         Вопрос {{ currentStep + 1 }} из {{ riddles.length }}
       </div>
 
+      <div class="question-location">
+        <YandexMap
+          :coordinates="[currentRiddle.coordinates[0], currentRiddle.coordinates[1]]"
+          :zoom="12"
+          placemark-text="Москва — столица России"
+        />
+      </div>
+
       <div class="question-text">
         {{ currentRiddle.question }}
       </div>
@@ -54,13 +62,41 @@ const maxPointsPerQuestion = 300;
 const store = useMainStore()
 
 const riddles = [
-  { question: "Стоит трон из лезвий, но сидеть на нём — не значит править. Что это?", answer: "Железный Трон" },    
-  { question: "Красный или зелёный — в огне рождённый. Кто это?", answer: "дракон" },  
-  { question: "Льётся кровь, но не в бою — решает, кто корону возьмёт свою. Что это?", answer: "наследство" },  
-  { question: "Летит пламя, но не сжигает; рев есть, но не слышен. Кто это?", answer: "Бейлон" },  
-  { question: "Две сестры, одна корона — кто возьмёт, тот и закон. О чём речь?", answer: "Рейнира и Алисента" },  
-  { question: "Без головы, но шепчет; без языка, но правит. Кто это?", answer: "Варис" },  
-  { question: "Чёрный или белый — но всегда в огне. Что это?", answer: "Дракарис" },  
+  { 
+    question: "Стоит трон из лезвий, но сидеть на нём — не значит править. Что это?", 
+    answer: "Железный Трон",
+    coordinates: [55.751244, 37.618423] 
+  },    
+  { 
+    question: "Красный или зелёный — в огне рождённый. Кто это?", 
+    answer: "дракон",
+    coordinates: [48.856613, 2.352222] 
+  },  
+  { 
+    question: "Льётся кровь, но не в бою — решает, кто корону возьмёт свою. Что это?", 
+    answer: "наследство",
+    coordinates: [40.712776, -74.005974] 
+  },  
+  { 
+    question: "Летит пламя, но не сжигает; рев есть, но не слышен. Кто это?", 
+    answer: "Бейлон",
+    coordinates: [51.507351, -0.127758] 
+  },  
+  { 
+    question: "Две сестры, одна корона — кто возьмёт, тот и закон. О чём речь?", 
+    answer: "Рейнира и Алисента",
+    coordinates: [35.689487, 139.691711] 
+  },  
+  { 
+    question: "Без головы, но шепчет; без языка, но правит. Кто это?", 
+    answer: "Варис",
+    coordinates: [41.902782, 12.496366] 
+  },  
+  { 
+    question: "Чёрный или белый — но всегда в огне. Что это?", 
+    answer: "Дракарис",
+    coordinates: [55.755825, 37.617298] 
+  },  
 ]
 
 const currentStep = ref(0);
@@ -154,6 +190,11 @@ function nextQuestion() {
     margin-bottom: 2.4rem;
     text-align: center;
     color: #333;
+  }
+
+  .question-location {
+    margin-bottom: 2.4rem;
+    text-align: center;
   }
 
   .input-wrapper {
