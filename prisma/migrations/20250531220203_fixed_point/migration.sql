@@ -6,5 +6,5 @@
 
 */
 -- AlterTable
-ALTER TABLE `point` ADD COLUMN `latitude` DOUBLE NOT NULL,
+ALTER TABLE `Point` ADD COLUMN `latitude` DOUBLE NOT NULL,
     ADD COLUMN `longitude` DOUBLE NOT NULL;

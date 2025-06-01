@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE `team` ALTER COLUMN `currentPoint` DROP DEFAULT;
+ALTER TABLE `Team` ALTER COLUMN `currentPoint` DROP DEFAULT;
 
 -- CreateTable
 CREATE TABLE `Admin` (
