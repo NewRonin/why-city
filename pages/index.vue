@@ -175,7 +175,7 @@ function nextQuestion() {
 
 <style scoped lang="scss">
 .quiz-page {
-  min-height: 100vh;
+  height: 100dvh;
   padding: 2.4rem 1.6rem;
   background-color: #f9f9fb;
   display: flex;
@@ -186,7 +186,7 @@ function nextQuestion() {
 
   .quiz-box {
     width: 100%;
-    max-width: 32rem;
+    max-width: 9rem;
     background-color: #fff;
     border-radius: 1.6rem;
     padding: 2.4rem 2rem;

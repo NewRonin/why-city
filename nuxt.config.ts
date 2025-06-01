@@ -45,6 +45,7 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@pinia/nuxt',
     '@primevue/nuxt-module',
+    '@prisma/nuxt',
   ],
 
   nitro: {

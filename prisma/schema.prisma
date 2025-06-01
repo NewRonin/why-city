@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Point {
+  id               Int      @id @default(autoincrement())
+  title            String
+  address          String   @db.Text
+  latitude         Float    // Широта
+  longitude        Float    // Долгота
+  taskType         TaskType
+  task             String   @db.Text
+  correctAnswer    String
+  successMessage   String   @db.Text
+  route            Route?   @relation(fields: [routeId], references: [id])
+  routeId          Int?
+}
+
+model Route {
+  id               Int      @id @default(autoincrement())
+  routeNumber      String
+  points           Point[]
+  teams            Team[]
+}
+
+model Team {
+  id               Int      @id @default(autoincrement())
+  name             String
+  password         String
+  route            Route    @relation(fields: [routeId], references: [id])
+  routeId          Int
+  currentPoint     Int      
+}
+
+model Admin {
+  id        Int     @id @default(autoincrement())
+  username  String  @unique
+  password  String  
+}
+
+enum TaskType {
+  text
+  image
+  audio
+}

@@ -1,0 +1,9 @@
+/*
+  Warnings:
+
+  - Added the required column `name` to the `Team` table without a default value. This is not possible if the table is not empty.
+
+*/
+-- AlterTable
+ALTER TABLE `team` ADD COLUMN `name` VARCHAR(191) NOT NULL,
+    MODIFY `currentPoint` INTEGER NOT NULL DEFAULT 0;
