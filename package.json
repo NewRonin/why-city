@@ -10,11 +10,11 @@
     "postinstall": "prisma generate && nuxt prepare"
   },
   "dependencies": {
+    "@nuxt/image": "^1.10.0",
     "@pinia/nuxt": "0.11.0",
     "@primeuix/themes": "^1.1.1",
     "@primevue/nuxt-module": "^4.3.4",
     "@prisma/client": "^6.8.2",
-    "@prisma/nuxt": "^0.3.0",
     "maska": "^2.1.10",
     "normalize.css": "^8.0.1",
     "nuxt": "^3.17.4",
