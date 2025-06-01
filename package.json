@@ -7,7 +7,10 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "prisma generate && nuxt prepare"
+    "postinstall": "prisma generate && nuxt prepare",
+    "prisma:reset": "prisma migrate reset --schema ./server/prisma/schema.prisma",
+    "prisma:migrate": "prisma migrate dev --schema ./server/prisma/schema.prisma",
+    "prisma:generate": "prisma generate --schema ./server/prisma/schema.prisma"
   },
   "dependencies": {
     "@nuxt/image": "^1.10.0",

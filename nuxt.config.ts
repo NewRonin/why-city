@@ -23,7 +23,9 @@ const CollabPreset = definePreset(Aura, {
 });
 
 export default defineNuxtConfig({
+  compatibilityDate: '2024-11-01',
   ssr: true,
+  devtools: { enabled: true },
   app: {
     head: {
       charset: "utf-8",
@@ -50,6 +52,9 @@ export default defineNuxtConfig({
   nitro: {
     experimental: {
       websocket: true,
+    },
+    replace: {
+      'import * as process': 'import * as processUnused',
     },
   },
 
