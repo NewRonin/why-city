@@ -52,6 +52,9 @@ export default defineNuxtConfig({
     experimental: {
       websocket: true,
     },
+    esbuild: {
+      target: 'es2022'
+    },
   },
 
   vite: {
