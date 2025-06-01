@@ -53,8 +53,10 @@ export default defineNuxtConfig({
       websocket: true,
     },
     esbuild: {
-      target: 'es2022'
-    },
+      options: {
+        target: 'es2022'
+      }
+    }
   },
 
   vite: {
