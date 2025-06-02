@@ -63,12 +63,13 @@ const handleLogin = async () => {
     })
     
     teamName.value = response.name
+    store.setUser(teamName.value)
+    store.setPassword(password.value)
+    navigateTo('/')
   } catch (error) {
-    errorMessage.value = error.data?.error || 'Неверный пароль команды'
+    errorMessage.value = 'Неверный пароль'
   } finally {
     isLoading.value = false
-    store.setUser('test')
-    navigateTo('/')
   }
 }
 

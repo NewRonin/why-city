@@ -51,6 +51,7 @@ export default defineNuxtConfig({
 
   nitro: {
     experimental: {
+
       websocket: true,
     },
     replace: {
@@ -86,7 +87,4 @@ export default defineNuxtConfig({
       exclude: ['Form', 'FormField', 'Editor', 'Chart']
     }
   },
-
-  compatibilityDate: '2024-04-03',
-  devtools: { enabled: false }
 })
