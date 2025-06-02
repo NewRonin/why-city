@@ -64,9 +64,11 @@ export default defineNuxtConfig({
       preprocessorOptions: {
         scss: {
           additionalData: `@import "@/assets/scss/mixins.scss";`,
-          noExternal: ['vue-countup-v3']
         }
       }
+    },
+    optimizeDeps : {
+      exclude: ['vue-countup-v3']
     }
   },
 

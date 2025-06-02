@@ -9,7 +9,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         return
     }
     else {
-        navigateTo('/')
+        return navigateTo('/')
     }
   }
   
@@ -26,9 +26,5 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   } catch (error) {
     store.clearPassword();
     return navigateTo('/login');
-  }
-  
-  if (to.path !== '/') {
-    return navigateTo('/');
   }
 });
