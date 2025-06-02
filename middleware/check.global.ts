@@ -13,6 +13,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     }
   }
   
+  if (to.path.startsWith('/admin')) {
+    setPageLayout('admin')
+  }
+
   if (!store.password) {
     return navigateTo('/login');
   }

@@ -17,7 +17,10 @@ model Point {
   latitude         Float    // Широта
   longitude        Float    // Долгота
   taskType         TaskType
-  task             String   @db.Text
+  taskText         String   @db.Text
+  filePath         String?  
+  fileSize         Int?     
+  mimeType         String?  
   correctAnswer    String
   successMessage   String   @db.Text
   route            Route?   @relation(fields: [routeId], references: [id])

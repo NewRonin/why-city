@@ -174,11 +174,47 @@
             <div class="form-group">
               <label>Задание</label>
               <Textarea 
-                v-model="currentPoint.task" 
+                v-model="currentPoint.taskText" 
                 placeholder="Опишите задание" 
                 rows="3" 
                 autoResize
               />
+            </div>
+
+            <!-- Для изображения -->
+            <div class="form-group" v-if="currentPoint.taskType === 'image'">
+              <label>Изображение</label>
+              <FileUpload 
+                mode="basic"
+                name="file"
+                :url="uploadUrl"
+                accept="image/*"
+                :maxFileSize="10000000"
+                @upload="onFileUploaded"
+                chooseLabel="Загрузить изображение"
+              />
+              <div v-if="currentPoint.filePath" class="preview-image">
+                <img :src="currentPoint.filePath" alt="Preview" />
+              </div>
+            </div>
+
+            <!-- Для аудио -->
+            <div class="form-group" v-if="currentPoint.taskType === 'audio'">
+              <label>Аудиофайл</label>
+              <FileUpload 
+                mode="basic"
+                name="file"
+                :url="uploadUrl"
+                accept="audio/*"
+                :maxFileSize="20000000"
+                @upload="onFileUploaded"
+                chooseLabel="Загрузить аудио"
+              />
+              <div v-if="currentPoint.filePath" class="preview-audio">
+                <audio controls>
+                  <source :src="currentPoint.filePath" type="audio/mpeg">
+                </audio>
+              </div>
             </div>
             
             <div class="form-group">
@@ -240,6 +276,8 @@ const routeForm = ref({
   points: []
 })
 
+const uploadUrl = computed(() => `/api/upload?type=${currentPoint.value.taskType}`)
+
 const currentPoint = ref(createEmptyPoint())
 
 const mode = ref('list') // 'list', 'edit', 'point'
@@ -252,9 +290,12 @@ function createEmptyPoint() {
     latitude: 0,
     longitude: 0,
     taskType: 'text',
-    task: '',
+    taskText: '', 
+    filePath: null, 
     correctAnswer: '',
-    successMessage: ''
+    successMessage: '',
+    fileSize: null,
+    mimeType: null
   }
 }
 
@@ -283,12 +324,10 @@ async function editRoute(route) {
 // Сохранить маршрут
 async function saveRoute() {
   try {
-    // Подготовка данных перед отправкой
     const dataToSend = {
       ...routeForm.value,
       points: routeForm.value.points.map(point => ({
         ...point,
-        // Удаляем временный ID, если он есть
         id: point.id && point.id < 1000000000000 ? point.id : undefined
       }))
     }
@@ -309,7 +348,6 @@ async function saveRoute() {
     await refresh()
   } catch (error) {
     console.error('Ошибка при сохранении маршрута:', error)
-    // Показываем пользователю сообщение об ошибке
   }
 }
 
@@ -356,6 +394,28 @@ function deletePoint(id) {
     routeForm.value.points = routeForm.value.points.filter(p => p.id !== id)
   }
 }
+
+function isImage(url) {
+  return /\.(jpeg|jpg|gif|png|webp)$/i.test(url)
+}
+
+function isAudio(url) {
+  return /\.(mp3|wav|ogg)$/i.test(url)
+}
+
+function onFileUploaded(event) {
+  try {
+    const response = JSON.parse(event.xhr.response)
+    if (response.filePath) {
+      currentPoint.value.filePath = response.filePath
+      currentPoint.value.fileSize = response.fileSize
+      currentPoint.value.mimeType = response.mimeType
+    }
+  } catch (error) {
+    console.error('Ошибка обработки загруженного файла:', error)
+  }
+}
+
 </script>
 
 <style scoped>
@@ -370,10 +430,6 @@ function deletePoint(id) {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-}
-
-.create-button {
-  background-color: var(--primary-color);
 }
 
 .edit-form {
@@ -400,19 +456,11 @@ function deletePoint(id) {
   margin: 30px 0 15px;
 }
 
-.add-point-btn {
-  background-color: var(--primary-color);
-}
-
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
-}
-
-.save-btn {
-  background-color: var(--primary-color);
 }
 
 .back-button {
@@ -451,6 +499,26 @@ function deletePoint(id) {
 .routes-table,
 .points-table {
   margin-top: 15px;
+}
+
+.preview-image {
+  margin-top: 10px;
+}
+
+.preview-image img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.preview-audio {
+  margin-top: 10px;
+}
+
+.preview-audio audio {
+  width: 100%;
+  margin-top: 10px;
 }
 
 /* Адаптивность */
