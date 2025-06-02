@@ -186,7 +186,7 @@ function nextQuestion() {
 
   .quiz-box {
     width: 100%;
-    max-width: 9rem;
+    max-width: 90rem;
     background-color: #fff;
     border-radius: 1.6rem;
     padding: 2.4rem 2rem;
