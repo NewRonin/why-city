@@ -48,41 +48,44 @@ export default defineEventHandler(async (event) => {
 
     // Обрабатываем точки
     const pointOperations = body.points.map(async (point) => {
-    try {
+      try {
         const pointData = {
-        title: point.title,
-        address: point.address,
-        latitude: point.latitude,
-        longitude: point.longitude,
-        taskType: point.taskType,
-        taskText: point.taskText || "", // Всегда строка
-        correctAnswer: point.correctAnswer,
-        successMessage: point.successMessage,
-        filePath: point.filePath || null,
-        fileSize: point.fileSize || null,
-        mimeType: point.mimeType || null
+          title: point.title,
+          address: point.address,
+          latitude: point.latitude,
+          longitude: point.longitude,
+          taskType: point.taskType,
+          taskText: point.taskText || "", // Всегда строка
+          correctAnswer: point.correctAnswer,
+          successMessage: point.successMessage,
+          filePath: point.filePath || null,
+          fileSize: point.fileSize || null,
+          mimeType: point.mimeType || null,
         };
 
         if (point.id && point.id < 1000000000000) {
-        // Обновляем существующую точку
-        return await prisma.point.update({
+          // Обновляем существующую точку
+          return await prisma.point.update({
             where: { id: point.id },
-            data: pointData
-        });
+            data: pointData,
+          });
         } else {
-        // Создаем новую точку
-        return await prisma.point.create({
+          // Создаем новую точку
+          return await prisma.point.create({
             data: {
-            ...pointData,
-            routeId: id
-            }
-        });
+              ...pointData,
+              routeId: id,
+            },
+          });
         }
-    } catch (error) {
-        console.error(`Ошибка при обработке точки ${point.id || 'new'}:`, error);
+      } catch (error) {
+        console.error(
+          `Ошибка при обработке точки ${point.id || "new"}:`,
+          error
+        );
         return null;
-    }
-});
+      }
+    });
 
     // Выполняем операции с точками
     await Promise.all(pointOperations);
@@ -95,6 +98,32 @@ export default defineEventHandler(async (event) => {
       },
       include: { points: true },
     });
+  }
+
+  if (event.method === "DELETE") {
+    // Check if route exists
+    const route = await prisma.route.findUnique({
+      where: { id },
+      include: { points: true },
+    });
+
+    if (!route) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Route not found",
+      });
+    }
+
+    await prisma.$transaction([
+      prisma.point.deleteMany({
+        where: { routeId: id },
+      }),
+      prisma.route.delete({
+        where: { id },
+      }),
+    ]);
+
+    return { success: true, message: "Route and associated points deleted" };
   }
 
   throw createError({ statusCode: 405, message: "Метод не разрешен" });
