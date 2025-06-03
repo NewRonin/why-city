@@ -102,6 +102,8 @@
                   optionLabel="label"
                   optionValue="value"
                   placeholder="Выберите тип"
+                  appendTo="self"
+                  class="w-full"
                 />
               </div>
             </div>
@@ -131,16 +133,6 @@
             </div>
             
             <div class="form-section full-width">
-              <div class="form-group">
-                <label>Задание</label>
-                <Textarea 
-                  v-model="currentPoint.taskText" 
-                  placeholder="Опишите задание" 
-                  rows="3" 
-                  autoResize
-                />
-              </div>
-
               <div class="form-group" v-if="currentPoint.taskType === 'image'">
                 <label>Изображение</label>
                 <FileUpload 
@@ -154,7 +146,12 @@
                   chooseLabel="Загрузить изображение"
                 />
                 <div v-if="currentPoint.filePath" class="preview-image">
-                  <img :src="currentPoint.filePath" alt="Preview" />
+                  <NuxtImg 
+                    v-if="loadedPreview"
+                    :src="currentPoint.filePath" 
+                    alt="Preview" 
+                    @error="loadedPreview = false"
+                  />
                 </div>
               </div>
 
@@ -175,6 +172,16 @@
                     <source :src="currentPoint.filePath" type="audio/mpeg">
                   </audio>
                 </div>
+              </div>
+              
+              <div class="form-group">
+                <label>Задание</label>
+                <Textarea 
+                  v-model="currentPoint.taskText" 
+                  placeholder="Опишите задание" 
+                  rows="3" 
+                  autoResize
+                />
               </div>
               
               <div class="form-group">
@@ -240,6 +247,7 @@ const routeForm = ref({
 
 const currentPoint = ref(createEmptyPoint())
 const pointDialogVisible = ref(false)
+const loadedPreview = ref(true)
 
 const uploadUrl = computed(() => `/api/upload?type=${currentPoint.value.taskType}`)
 
@@ -422,7 +430,7 @@ textarea:focus,
 }
 
 .add-point-btn {
-  height: 36px;
+  height: 3.6rem;
   font-weight: 600;
 }
 
@@ -453,16 +461,13 @@ textarea:focus,
 }
 
 .save-btn {
-  background-color: var(--primary-color, #3f51b5);
-  color: white;
   font-weight: 600;
   min-width: 120px;
-  box-shadow: 0 3px 8px rgb(63 81 181 / 0.4);
   transition: background-color 0.3s ease;
 }
 
-.save-btn:hover {
-  background-color: #2c387e;
+.p-fileupload-basic{
+  justify-content: flex-start;
 }
 
 .preview-image img,
@@ -477,7 +482,7 @@ textarea:focus,
   .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px 40px;
+    gap: 0px 40px;
   }
 
   .form-section {

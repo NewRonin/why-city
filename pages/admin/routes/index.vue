@@ -83,7 +83,7 @@ const deleteRoute = async (id) => {
 }
 
 .create-button {
-  height: 40px;
+  height: 3.6rem;
   font-weight: 600;
 }
 
