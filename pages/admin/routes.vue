@@ -418,17 +418,24 @@ function onFileUpload(event) {
   const file = event.files?.[0] || event.target?.files?.[0]
   if (!file) return
 
-  currentPoint.value.uploadedFile = file
-
-  // Preview
-  if (currentPoint.value.taskType === 'image') {
-    currentPoint.value.filePath = URL.createObjectURL(file)
-  } else if (currentPoint.value.taskType === 'audio') {
-    currentPoint.value.filePath = URL.createObjectURL(file)
+  console.log(event)
+  
+  try {
+    // Ответ сервера содержится в xhr.response
+    const response = JSON.parse(event.xhr.response);
+    if (response.filePath) { // или response.filePath в зависимости от вашего API
+      currentPoint.value.filePath = response.filePath;
+      currentPoint.value.fileSize = response.fileSize;
+      currentPoint.value.mimeType = response.mimeType;
+      
+      // Очищаем временный blob URL
+      if (event.files?.[0]?.objectURL) {
+        URL.revokeObjectURL(event.files[0].objectURL);
+      }
+    }
+  } catch (error) {
+    console.error('Ошибка обработки загруженного файла:', error);
   }
-
-  currentPoint.value.fileSize = file.size
-  currentPoint.value.mimeType = file.type
 }
 
 </script>
