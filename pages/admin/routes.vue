@@ -442,115 +442,225 @@ function onFileUpload(event) {
 
 <style scoped>
 .route-builder {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 30px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
-.edit-form {
-  background: white;
+.header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.create-button {
+  height: 40px;
+  font-weight: 600;
+}
+
+.routes-table,
+.points-table {
+  margin-top: 15px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+}
+
+/* Таблица */
+.p-datatable table {
+  border-collapse: separate !important;
+  border-spacing: 0 10px !important;
+}
+
+.p-datatable-tbody > tr {
+  background: #fff;
   border-radius: 6px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
+  transition: background-color 0.2s;
+}
+
+.p-datatable-tbody > tr:hover {
+  background-color: #f0f8ff;
+}
+
+.p-datatable-tbody > tr > td {
+  padding: 12px 15px;
+  vertical-align: middle;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.edit-btn,
+.delete-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+/* Редактирование маршрута и точки */
+.edit-form {
+  background: #fff;
+  border-radius: 8px;
+  padding: 30px 30px 40px;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #444;
 }
 
-.points-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 30px 0 15px;
+input[type="text"],
+textarea,
+.p-inputtext,
+.p-dropdown,
+:deep(.p-inputnumber>input) {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 1rem;
+  transition: border-color 0.25s;
 }
 
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+input[type="text"]:focus,
+textarea:focus,
+.p-inputtext:focus,
+.p-dropdown:focus,
+:deep(.p-inputnumber>input:focus) {
+  outline: none;
+  box-shadow: 0 0 5px rgba(63, 81, 181, 0.3);
 }
 
-.back-button {
-  margin-bottom: 15px;
+.p-inputnumber {
+  width: 100%;
 }
 
+/* Формы точек */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 30px 40px;
 }
 
 .form-section {
   display: flex;
   flex-direction: column;
-  gap: 20px;
 }
 
 .full-width {
   grid-column: span 2;
 }
 
-.actions {
+/* Заголовок секции точек */
+.points-header {
   display: flex;
-  gap: 5px;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px 0 20px;
 }
 
-.edit-btn {
-  color: var(--primary-color);
+.add-point-btn {
+  height: 36px;
+  font-weight: 600;
 }
 
-.delete-btn {
-  color: var(--red-500);
+/* Кнопки действий */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
 }
 
-.routes-table,
-.points-table {
-  margin-top: 15px;
+.back-button {
+  margin-bottom: 25px;
+  font-weight: 500;
+  font-size: 1.1rem;
 }
 
-.preview-image {
-  margin-top: 10px;
+.cancel-btn {
+  color: #777;
+  font-weight: 600;
+  min-width: 110px;
 }
 
-.preview-image img {
-  max-width: 100%;
-  max-height: 200px;
-  border-radius: 4px;
-  margin-top: 10px;
+.save-btn {
+  background-color: var(--primary-color, #3f51b5);
+  color: white;
+  font-weight: 600;
+  min-width: 120px;
+  box-shadow: 0 3px 8px rgb(63 81 181 / 0.4);
+  transition: background-color 0.3s ease;
 }
 
-.preview-audio {
-  margin-top: 10px;
+.save-btn:hover {
+  background-color: #2c387e;
 }
 
+/* Превью изображений и аудио */
+.preview-image img,
 .preview-audio audio {
   width: 100%;
-  margin-top: 10px;
+  max-height: 200px;
+  border-radius: 8px;
+  margin-top: 12px;
 }
 
-/* Адаптивность */
+/* Мобильная адаптивность */
 @media (max-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr;
   }
-  
   .full-width {
     grid-column: span 1;
   }
+  .header,
+  .points-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  .create-button,
+  .add-point-btn {
+    width: 100%;
+    max-width: 300px;
+  }
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cancel-btn,
+  .save-btn {
+    width: 100%;
+    min-width: unset;
+  }
+  .actions {
+    justify-content: flex-start;
+  }
 }
+
 </style>
