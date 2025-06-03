@@ -187,10 +187,11 @@
               <FileUpload 
                 mode="basic"
                 name="file"
+                auto
                 :url="uploadUrl"
                 accept="image/*"
                 :maxFileSize="10000000"
-                @upload="onFileUploaded"
+                @upload="onFileUpload"
                 chooseLabel="Загрузить изображение"
               />
               <div v-if="currentPoint.filePath" class="preview-image">
@@ -204,10 +205,11 @@
               <FileUpload 
                 mode="basic"
                 name="file"
+                auto
                 :url="uploadUrl"
                 accept="audio/*"
                 :maxFileSize="20000000"
-                @upload="onFileUploaded"
+                @upload="onFileUpload"
                 chooseLabel="Загрузить аудио"
               />
               <div v-if="currentPoint.filePath" class="preview-audio">
@@ -255,7 +257,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const { data: routes, refresh } = useFetch('/api/routes')
 
 const taskTypes = [
@@ -292,6 +294,7 @@ function createEmptyPoint() {
     taskType: 'text',
     taskText: '', 
     filePath: null, 
+    uploadedFile: null,
     correctAnswer: '',
     successMessage: '',
     fileSize: null,
@@ -366,25 +369,33 @@ async function deleteRoute(id) {
 
 // Добавить/редактировать точку
 function editPoint(point = null) {
-  currentPoint.value = point 
-    ? { ...point } 
-    : createEmptyPoint()
+  if (point) {
+    currentPoint.value = { 
+      ...point,
+      uploadedFile: null // Сбрасываем загружаемый файл
+    }
+  } else {
+    currentPoint.value = createEmptyPoint()
+  }
   mode.value = 'point'
 }
 
 // Сохранить точку
-function savePoint() {
+async function savePoint() {
+  // Сохраняем точку в маршруте
+  const savedPoint = { ...currentPoint.value }
+  delete savedPoint.uploadedFile // Удаляем временное поле
+
   if (currentPoint.value.id) {
     const index = routeForm.value.points.findIndex(p => p.id === currentPoint.value.id)
-    if (index !== -1) {
-      routeForm.value.points[index] = { ...currentPoint.value }
-    }
+    routeForm.value.points[index] = savedPoint
   } else {
     routeForm.value.points.push({
-      ...currentPoint.value,
+      ...savedPoint,
       id: Date.now() // Временный ID для UI
     })
   }
+  
   mode.value = 'edit'
 }
 
@@ -403,17 +414,21 @@ function isAudio(url) {
   return /\.(mp3|wav|ogg)$/i.test(url)
 }
 
-function onFileUploaded(event) {
-  try {
-    const response = JSON.parse(event.xhr.response)
-    if (response.filePath) {
-      currentPoint.value.filePath = response.filePath
-      currentPoint.value.fileSize = response.fileSize
-      currentPoint.value.mimeType = response.mimeType
-    }
-  } catch (error) {
-    console.error('Ошибка обработки загруженного файла:', error)
+function onFileUpload(event) {
+  const file = event.files?.[0] || event.target?.files?.[0]
+  if (!file) return
+
+  currentPoint.value.uploadedFile = file
+
+  // Preview
+  if (currentPoint.value.taskType === 'image') {
+    currentPoint.value.filePath = URL.createObjectURL(file)
+  } else if (currentPoint.value.taskType === 'audio') {
+    currentPoint.value.filePath = URL.createObjectURL(file)
   }
+
+  currentPoint.value.fileSize = file.size
+  currentPoint.value.mimeType = file.type
 }
 
 </script>

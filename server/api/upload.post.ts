@@ -42,6 +42,7 @@ export default defineEventHandler(async (event) => {
   
   // Сохраняем файл
   await new Promise((resolve, reject) => {
+    console.log('Saving file to:', filepath)
     const stream = createWriteStream(filepath)
     stream.write(file.data)
     stream.end()
