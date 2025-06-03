@@ -1,4 +1,4 @@
-import prisma from '../utils/prisma'
+import prisma from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const method = getMethod(event)
@@ -68,6 +68,24 @@ export default defineEventHandler(async (event) => {
           currentPoint: updateData.currentPoint ? Number(updateData.currentPoint) : undefined
         }
       })
+    } catch (error) {
+      throw createError({ statusCode: 500, statusMessage: 'Internal server error' })
+    }
+  }
+
+  // Добавьте обработку DELETE
+  if (method === 'DELETE') {
+    const { id } = getQuery(event)
+    
+    if (!id) {
+      throw createError({ statusCode: 400, statusMessage: 'ID is required' })
+    }
+    
+    try {
+      await prisma.team.delete({
+        where: { id: Number(id) }
+      })
+      return { success: true }
     } catch (error) {
       throw createError({ statusCode: 500, statusMessage: 'Internal server error' })
     }
