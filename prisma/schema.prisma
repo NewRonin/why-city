@@ -37,7 +37,7 @@ model Route {
 model Team {
   id               Int      @id @default(autoincrement())
   name             String
-  password         String
+  password         String   @unique
   route            Route    @relation(fields: [routeId], references: [id])
   routeId          Int
   currentPoint     Int      

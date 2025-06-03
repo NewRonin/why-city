@@ -23,14 +23,7 @@ export default defineEventHandler(async (event) => {
     
     // Поиск команды в базе данных
     const team = await prisma.team.findFirst({
-      where: { password },
-      include: { 
-        route: { 
-          include: { 
-            points: true 
-          } 
-        } 
-      }
+      where: { password }
     })
     
     if (!team) {
