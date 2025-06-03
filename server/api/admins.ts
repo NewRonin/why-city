@@ -1,50 +1,96 @@
 import prisma from '../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  const method = getMethod(event)
-  const id = getRouterParam(event, 'id')
+  // Разделяем обработку по методам
+  switch (event.method) {
+    case 'GET':
+      return handleGetRequest(event)
+    case 'POST':
+      return handlePostRequest(event)
+    case 'PUT':
+      return handlePutRequest(event)
+    case 'DELETE':
+      return handleDeleteRequest(event)
+    default:
+      throw createError({
+        statusCode: 405,
+        statusMessage: 'Method Not Allowed'
+      })
+  }
+})
 
-  // GET /api/admins - все админы
-  if (method === 'GET' && !id) {
+async function handleGetRequest(event) {
+  const query = getQuery(event)
+  
+  if (!query.id) {
+    // GET /api/admins - список всех администраторов
     return await prisma.admin.findMany({
       select: {
         id: true,
         username: true,
+      },
+      orderBy: {
+        id: 'desc'
       }
     })
-  }
-
-  // GET /api/admins/:id - конкретный админ
-  if (method === 'GET' && id) {
+  } else {
+    // GET /api/admins?id=1 - конкретный администратор
     const admin = await prisma.admin.findUnique({
-      where: { id: Number(id) },
+      where: { id: Number(query.id) },
       select: { id: true, username: true }
     })
     if (!admin) throw createError({ statusCode: 404 })
     return admin
   }
+}
 
-  // POST /api/admins - создать админа
-  if (method === 'POST') {
-    const { username, password } = await readBody(event)
-    if (!username || !password) throw createError({ statusCode: 400 })
-    return await prisma.admin.create({ data: { username, password } })
-  }
-
-  // PUT /api/admins/:id - обновить админа
-  if (method === 'PUT' && id) {
-    const { username, password } = await readBody(event)
-    return await prisma.admin.update({
-      where: { id: Number(id) },
-      data: { username, password }
+async function handlePostRequest(event) {
+  const body = await readBody(event)
+  
+  if (!body.username || !body.password) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Username and password are required'
     })
   }
+  
+  return await prisma.admin.create({
+    data: {
+      username: body.username,
+      password: body.password
+    },
+    select: {
+      id: true,
+      username: true
+    }
+  })
+}
 
-  // DELETE /api/admins/:id - удалить админа
-  if (method === 'DELETE' && id) {
-    await prisma.admin.delete({ where: { id: Number(id) } })
-    return { success: true }
-  }
+async function handlePutRequest(event) {
+  const query = getQuery(event)
+  const body = await readBody(event)
+  
+  if (!query.id) throw createError({ statusCode: 400 })
+  if (!body.username) throw createError({ statusCode: 400 })
+  
+  const updateData: any = { username: body.username }
+  if (body.password) updateData.password = body.password
+  
+  return await prisma.admin.update({
+    where: { id: Number(query.id) },
+    data: updateData,
+    select: {
+      id: true,
+      username: true
+    }
+  })
+}
 
-  throw createError({ statusCode: 405 })
-})
+async function handleDeleteRequest(event) {
+  const query = getQuery(event)
+  
+  if (!query.id) throw createError({ statusCode: 400 })
+  
+  await prisma.admin.delete({ where: { id: Number(query.id) } })
+  return { success: true }
+}

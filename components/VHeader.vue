@@ -26,6 +26,11 @@
           <i class="pi pi-users"></i>
           <span>Команды</span>
         </NuxtLink >
+
+        <NuxtLink to="/admin/access" class="nav-link" active-class="active">
+          <i class="pi pi-shield"></i>
+          <span>Администраторы</span>
+        </NuxtLink>
       </nav>
       
       <Button 
