@@ -57,6 +57,12 @@ export default defineNuxtConfig({
     replace: {
       'import * as process': 'import * as processUnused',
     },
+    publicAssets: [
+      {
+        dir: 'public', 
+        maxAge: 60,
+      },
+    ]
   },
 
   vite: {

@@ -5,8 +5,9 @@ import { fileURLToPath } from 'node:url'
 import { randomUUID } from 'node:crypto'
 import { pipeline } from 'node:stream/promises'
 import { Readable } from 'node:stream'
+import { useRuntimeConfig } from '#imports'
 
-const uploadDir = resolve(process.cwd(), 'public/uploads')
+const uploadDir = resolve(useRuntimeConfig().rootDir || process.cwd(), '.output/public/uploads')
 
 // Создаем директорию, если не существует
 mkdirSync(uploadDir, { recursive: true })
@@ -44,6 +45,7 @@ export default defineEventHandler(async (event) => {
   const extension = file.filename?.split('.').pop()?.toLowerCase() || 'bin'
   const filename = `${randomUUID()}.${extension}`
   const filepath = resolve(uploadDir, filename)
+  console.log('Сохраняю в:', filepath)
 
   try {
     console.log(`Saving file to: ${filepath}`)
