@@ -1,27 +1,41 @@
 <template>
   <div class="quiz-page">
-    <div v-if="!isFinished" class="quiz-box">
+    <div v-if="isLoading" class="loading-state">Загрузка вопросов...</div>
+
+    <div v-else-if="!isFinished" class="quiz-box">
       <div class="step-counter">
-        Вопрос {{ currentStep + 1 }} из {{ riddles.length }}
+        Вопрос {{ currentStep }} из {{ riddles.length }}
       </div>
 
-      <div class="question-location">
+      <div v-if="currentRiddle?.coordinates" class="question-location">
         <YandexMap
-          :coordinates="[currentRiddle.coordinates[0], currentRiddle.coordinates[1]]"
+          :coordinates="currentRiddle.coordinates"
           :zoom="18"
-          placemark-text="Москва — столица России"
+          placemark-text="Текущее местоположение"
         />
-
-        <YandexLink 
-          :coordinates="[currentRiddle.coordinates[0], currentRiddle.coordinates[1]]"
+        <YandexLink
+          :coordinates="currentRiddle.coordinates"
           :address="currentRiddle.address"
         />
-        
       </div>
 
-      <div class="question-text">
-        {{ currentRiddle.question }}
+      <div v-if="currentRiddle" class="question-text">
+        {{ currentRiddle.taskText || currentRiddle.title }}
       </div>
+
+      <!-- Аудио (если нужно) -->
+      <audio
+        v-if="currentRiddle?.filePath && currentRiddle.taskType === 'audio'"
+        controls
+      >
+        <source :src="currentRiddle.filePath" :type="currentRiddle.mimeType" />
+      </audio>
+
+      <NuxtImg
+        v-if="currentRiddle?.filePath && currentRiddle.taskType === 'image'"
+        :src="currentPoint.filePath"
+        alt="Task Image"
+      />
 
       <div class="input-wrapper">
         <InputText
@@ -42,136 +56,149 @@
       </div>
 
       <div class="action-buttons">
-        <Button label="Далее" @click="nextQuestion" :disabled="!isAnswered && attemptsLeft > 0" />
+        <Button
+          label="Далее"
+          @click="nextQuestion"
+          :disabled="!isAnswered && attemptsLeft > 0"
+        />
       </div>
     </div>
+
     <div v-else class="quiz-finished">
       🎉 Квест завершён! <br />
-      Ваш счёт: <strong>{{ store.score }}$</strong>
+      Ваш счёт: <strong>{{ score }}$</strong>
     </div>
 
     <div class="result-message">
-        <div :style="{visibility: showResult ? 'visible' : 'hidden'}">{{ resultMessage }}</div>
+      <div :style="{ visibility: showResult ? 'visible' : 'hidden' }">
+        {{ resultMessage }}
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
-import { PrimeIcons } from "@primevue/core/api";
-import { useMainStore } from '@/stores/main'
+import { useMainStore } from "@/stores/main";
 
+const store = useMainStore();
 const maxAttempts = 3;
-const maxPointsPerQuestion = 300;
-const store = useMainStore()
 
-const riddles = [
-  { 
-    question: "Стоит трон из лезвий, но сидеть на нём — не значит править. Что это?", 
-    answer: "Железный Трон",
-    coordinates: [55.7512, 37.6184],
-    yandexMapLink: "https://yandex.ru/maps/?pt=37.6184,55.7512&z=15",
-    address: "Москва, Кремль (условно — Железный Трон)"
-  },    
-  { 
-    question: "Красный или зелёный — в огне рождённый. Кто это?", 
-    answer: "дракон",
-    coordinates: [48.8566, 2.3522],
-    yandexMapLink: "https://yandex.ru/maps/?pt=2.3522,48.8566&z=15",
-    address: "Париж, Франция (Драконий замок)"
-  },  
-  { 
-    question: "Льётся кровь, но не в бою — решает, кто корону возьмёт свою. Что это?", 
-    answer: "наследство",
-    coordinates: [40.7128, -74.0060],
-    yandexMapLink: "https://yandex.ru/maps/?pt=-74.0060,40.7128&z=15",
-    address: "Нью-Йорк, Уолл-стрит (символ власти)"
-  },  
-  { 
-    question: "Летит пламя, но не сжигает; рев есть, но не слышен. Кто это?", 
-    answer: "Бейлон",
-    coordinates: [51.5074, -0.1278],
-    yandexMapLink: "https://yandex.ru/maps/?pt=-0.1278,51.5074&z=15",
-    address: "Лондон, Тауэр (место интриг)"
-  },  
-  { 
-    question: "Две сестры, одна корона — кто возьмёт, тот и закон. О чём речь?", 
-    answer: "Рейнира и Алисента",
-    coordinates: [35.6895, 139.6917],
-    yandexMapLink: "https://yandex.ru/maps/?pt=139.6917,35.6895&z=15",
-    address: "Токио, Императорский дворец (дворцовые войны)"
-  },  
-  { 
-    question: "Без головы, но шепчет; без языка, но правит. Кто это?", 
-    answer: "Варис",
-    coordinates: [41.9028, 12.4964],
-    yandexMapLink: "https://yandex.ru/maps/?pt=12.4964,41.9028&z=15",
-    address: "Рим, Ватикан (тайная власть)"
-  },  
-  { 
-    question: "Чёрный или белый — но всегда в огне. Что это?", 
-    answer: "Дракарис",
-    coordinates: [55.7558, 37.6173],
-    yandexMapLink: "https://yandex.ru/maps/?pt=37.6173,55.7558&z=15",
-    address: "Москва, Красная площадь (пламя революции)"
-  },  
-]
-
-const currentStep = ref(0);
+// Состояние загрузки
+const isLoading = ref(true);
+const riddles = ref([]);
+const currentStep = ref(1);
 const userAnswer = ref("");
 const attemptsLeft = ref(maxAttempts);
-const currentPoints = ref(maxPointsPerQuestion);
 const showResult = ref(false);
 const resultMessage = ref("");
 const isAnswered = ref(false);
-const isInvalid = ref(false)
+const isInvalid = ref(false);
+const teamId = ref(null);
+const score = ref(0);
+const isFinished = ref(false);
 
-const isFinished = computed(() => currentStep.value >= riddles.length);
-const currentRiddle = computed(() => riddles[currentStep.value] || {});
+// Загрузка состояния
+onMounted(async () => {
+  try {
+    const data = await $fetch("/api/quiz", {
+      query: { teamPassword: store.password },
+    });
 
-function submitAnswer() {
-  if (!userAnswer.value.trim() || isAnswered.value || attemptsLeft.value <= 0)
+    if (data?.questions?.length) {
+      riddles.value = data.questions;
+      teamId.value = data.teamId;
+      currentStep.value = data.currentPoint || 0;
+      score.value = data.score || 0;
+    } else {
+      console.error("Нет данных вопросов");
+      // Можно добавить редирект или сообщение об ошибке
+    }
+  } catch (error) {
+    console.error("Ошибка загрузки:", error);
+    // Обработка ошибки (редирект, уведомление и т.д.)
+  } finally {
+    isLoading.value = false;
+  }
+});
+
+const currentRiddle = computed(() => {
+  const riddle = riddles.value[currentStep.value - 1];
+  if (!riddle) return null;
+
+  // Форматируем координаты для YandexMap
+  if (riddle.latitude && riddle.longitude) {
+    riddle.coordinates = [riddle.latitude, riddle.longitude];
+  }
+
+  return riddle;
+});
+
+async function submitAnswer() {
+  if (
+    !userAnswer.value.trim() ||
+    isAnswered.value ||
+    attemptsLeft.value <= 0 ||
+    !currentRiddle.value
+  )
     return;
 
-  const normalized = userAnswer.value.trim().toLowerCase();
-  const correct = currentRiddle.value.answer.toLowerCase();
+  try {
+    const response = await $fetch("/api/quiz", {
+      method: "POST",
+      body: {
+        teamId: teamId.value,
+        pointId: currentRiddle.value.id,
+        answer: userAnswer.value,
+        attempts: maxAttempts - attemptsLeft.value,
+      },
+    });
 
-  if (normalized === correct) {
-    resultMessage.value = "✅ Верно!";
-    store.addPoints(currentPoints.value)
+    if (response?.isCorrect) {
+      resultMessage.value = "✅ Верно!";
+      score.value = response.newScore || 0;
+      isFinished.value = response.isFinished || false;
+    } else {
+      attemptsLeft.value--;
+      resultMessage.value =
+        attemptsLeft.value > 0
+          ? `❌ Неверно. Осталось попыток: ${attemptsLeft.value}`
+          : `❌ Все попытки исчерпаны. Правильный ответ: ${
+              response?.correctAnswer || currentRiddle.value.answer
+            }`;
+    }
+
     isAnswered.value = true;
     showResult.value = true;
-    isInvalid.value = false
-  } else {
-    attemptsLeft.value--;
-    currentPoints.value = currentPoints.value - (maxPointsPerQuestion / 3);
-    isInvalid.value = true
-
-    if (attemptsLeft.value > 0) {
-      resultMessage.value = `❌ Неверно.\nОсталось попыток: ${attemptsLeft.value}`;
-    }
-
-    if (attemptsLeft.value === 0) {
-      resultMessage.value = `❌ Все попытки исчерпаны.\nПравильный ответ: ${currentRiddle.value.answer}`;
-      isAnswered.value = true;
-    }
-
+    isInvalid.value = !response?.isCorrect;
+  } catch (error) {
+    console.error("Ошибка:", error);
+    resultMessage.value = "Ошибка при отправке ответа";
     showResult.value = true;
   }
 }
 
 function nextQuestion() {
+  if (isFinished.value) return;
+
   currentStep.value++;
   userAnswer.value = "";
   attemptsLeft.value = maxAttempts;
-  currentPoints.value = maxPointsPerQuestion;
   showResult.value = false;
   resultMessage.value = "";
   isAnswered.value = false;
 }
 </script>
+
+<style scoped>
+.loading-state {
+  font-size: 1.8rem;
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+</style>
 
 <style scoped lang="scss">
 .quiz-page {
