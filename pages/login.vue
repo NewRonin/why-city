@@ -139,8 +139,7 @@ const handleAdminLogin = async () => {
       }
     })
     
-    store.setUser(adminUsername.value)
-    store.setAdminPassword(adminPassword.value)
+    store.setAdminPassword(adminUsername.value, adminPassword.value)
     store.setIsAdmin(true)
     navigateTo('/admin')
   } catch (error) {

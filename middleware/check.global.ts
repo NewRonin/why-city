@@ -16,7 +16,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     
     // Если нет пароля админа - на логин
     if (!store.adminPassword) {
-      return navigateTo('/login?admin=1');
+      return navigateTo('/login');
     }
     
     // Проверяем валидность админского пароля
@@ -24,9 +24,12 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       await $fetch("/api/auth/admin", {
         method: "POST",
         body: { 
-          username: store.user,
+          username: store.adminLogin,
           password: store.adminPassword 
         },
+        headers: process.server ? { 
+          cookie: useRequestHeaders(['cookie']).cookie || '' 
+        } : {},
       });
       return; // Все ок, пропускаем
     } catch (error) {
@@ -45,6 +48,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     const response = await $fetch("/api/auth/team", {
       method: "POST",
       body: { password: store.password },
+      headers: process.server ? { 
+        cookie: useRequestHeaders(['cookie']).cookie || '' 
+      } : {},
     });
     store.setUser(response.name);
   } catch (error) {
