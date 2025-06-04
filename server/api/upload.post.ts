@@ -6,8 +6,7 @@ import { randomUUID } from 'node:crypto'
 import { pipeline } from 'node:stream/promises'
 import { Readable } from 'node:stream'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const uploadDir = resolve(__dirname, '../../public/uploads')
+const uploadDir = resolve(process.cwd(), 'public/uploads')
 
 // Создаем директорию, если не существует
 mkdirSync(uploadDir, { recursive: true })
