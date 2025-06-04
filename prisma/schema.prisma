@@ -40,7 +40,8 @@ model Team {
   password         String   @unique
   route            Route    @relation(fields: [routeId], references: [id])
   routeId          Int
-  currentPoint     Int      
+  currentPoint     Int
+  score            Int      @default(0)      
 }
 
 model Admin {

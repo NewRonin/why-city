@@ -33,7 +33,7 @@
 
       <NuxtImg
         v-if="currentRiddle?.filePath && currentRiddle.taskType === 'image'"
-        :src="currentPoint.filePath"
+        :src="currentRiddle.filePath"
         alt="Task Image"
       />
 
@@ -109,7 +109,7 @@ onMounted(async () => {
     if (data?.questions?.length) {
       riddles.value = data.questions;
       teamId.value = data.teamId;
-      currentStep.value = data.currentPoint || 0;
+      currentStep.value = data.currentPoint || 1;
       score.value = data.score || 0;
     } else {
       console.error("Нет данных вопросов");
@@ -136,13 +136,7 @@ const currentRiddle = computed(() => {
 });
 
 async function submitAnswer() {
-  if (
-    !userAnswer.value.trim() ||
-    isAnswered.value ||
-    attemptsLeft.value <= 0 ||
-    !currentRiddle.value
-  )
-    return;
+  if (!userAnswer.value.trim() || isAnswered.value || attemptsLeft.value <= 0 || !currentRiddle.value) return
 
   try {
     const response = await $fetch("/api/quiz", {
@@ -150,36 +144,39 @@ async function submitAnswer() {
       body: {
         teamId: teamId.value,
         pointId: currentRiddle.value.id,
-        answer: userAnswer.value,
+        answer: userAnswer.value.trim(),
         attempts: maxAttempts - attemptsLeft.value,
       },
-    });
+    })
 
     if (response?.isCorrect) {
-      resultMessage.value = "✅ Верно!";
-      score.value = response.newScore || 0;
-      isFinished.value = response.isFinished || false;
+      resultMessage.value = currentRiddle.value.successMessage || "✅ Верно! +" + response.newScore
+      score.value += response.newScore
+      isFinished.value = response.isFinished
+      
+      // Auto-advance if correct
+      if (!isFinished.value) {
+        setTimeout(nextQuestion, 1500)
+      }
     } else {
-      attemptsLeft.value--;
-      resultMessage.value =
-        attemptsLeft.value > 0
-          ? `❌ Неверно. Осталось попыток: ${attemptsLeft.value}`
-          : `❌ Все попытки исчерпаны. Правильный ответ: ${
-              response?.correctAnswer || currentRiddle.value.answer
-            }`;
+      attemptsLeft.value--
+      resultMessage.value = attemptsLeft.value > 0
+        ? `❌ Неверно. Осталось попыток: ${attemptsLeft.value}`
+        : `❌ Правильный ответ: ${response?.correctAnswer || currentRiddle.value.correctAnswer}`
     }
 
-    isAnswered.value = true;
-    showResult.value = true;
-    isInvalid.value = !response?.isCorrect;
+    isAnswered.value = true
+    showResult.value = true
+    isInvalid.value = !response?.isCorrect
+
   } catch (error) {
-    console.error("Ошибка:", error);
-    resultMessage.value = "Ошибка при отправке ответа";
-    showResult.value = true;
+    console.error("Ошибка:", error)
+    resultMessage.value = "Ошибка при отправке ответа"
+    showResult.value = true
   }
 }
 
-function nextQuestion() {
+const nextQuestion = () => {
   if (isFinished.value) return;
 
   currentStep.value++;
@@ -188,7 +185,17 @@ function nextQuestion() {
   showResult.value = false;
   resultMessage.value = "";
   isAnswered.value = false;
-}
+  isInvalid.value = false;
+
+  // SSR-compatible scroll
+  const scrollToTop = () => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+  
+  nextTick(() => scrollToTop());
+};
 </script>
 
 <style scoped>
