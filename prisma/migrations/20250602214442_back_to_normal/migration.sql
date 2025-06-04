@@ -1,8 +1,8 @@
 -- DropForeignKey
-ALTER TABLE `point` DROP FOREIGN KEY `Point_routeId_fkey`;
+ALTER TABLE `Point` DROP FOREIGN KEY `Point_routeId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `team` DROP FOREIGN KEY `Team_routeId_fkey`;
+ALTER TABLE `Team` DROP FOREIGN KEY `Team_routeId_fkey`;
 
 -- DropIndex
 DROP INDEX `Point_routeId_fkey` ON `Point`;
