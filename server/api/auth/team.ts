@@ -54,9 +54,6 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal server error',
-      data: { 
-        originalError: process.env.NODE_ENV === 'development' ? error.message : undefined
-      }
     })
   }
 })
