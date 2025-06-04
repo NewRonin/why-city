@@ -89,4 +89,7 @@ export default defineNuxtConfig({
       exclude: ['Form', 'FormField', 'Editor', 'Chart']
     }
   },
+  runtimeConfig: {
+    dbUrl: process.env.DATABASE_URL, 
+  },
 })
