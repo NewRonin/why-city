@@ -1,4 +1,4 @@
 -- AlterTable
-ALTER TABLE `point` ADD COLUMN `filePath` VARCHAR(191) NULL,
+ALTER TABLE `Point` ADD COLUMN `filePath` VARCHAR(191) NULL,
     ADD COLUMN `fileSize` INTEGER NULL,
     ADD COLUMN `mimeType` VARCHAR(191) NULL;

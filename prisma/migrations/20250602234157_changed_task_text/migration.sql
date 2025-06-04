@@ -6,5 +6,5 @@
 
 */
 -- AlterTable
-ALTER TABLE `point` DROP COLUMN `task`,
+ALTER TABLE `Point` DROP COLUMN `task`,
     ADD COLUMN `taskText` TEXT NOT NULL;
