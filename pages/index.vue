@@ -153,6 +153,7 @@ async function submitAnswer() {
       resultMessage.value = currentRiddle.value.successMessage || "✅ Верно! +" + response.newScore
       score.value += response.newScore
       isFinished.value = response.isFinished
+      isAnswered.value = true
       
       // Auto-advance if correct
       if (!isFinished.value) {
@@ -164,8 +165,6 @@ async function submitAnswer() {
         ? `❌ Неверно. Осталось попыток: ${attemptsLeft.value}`
         : `❌ Правильный ответ: ${response?.correctAnswer || currentRiddle.value.correctAnswer}`
     }
-
-    isAnswered.value = true
     showResult.value = true
     isInvalid.value = !response?.isCorrect
 

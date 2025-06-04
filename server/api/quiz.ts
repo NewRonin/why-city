@@ -91,7 +91,7 @@ export default defineEventHandler(async (event) => {
         }
       })
 
-      isFinished = team.currentPoint - 1 >= team.route.points.length
+      isFinished = team.currentPoint > team.route.points.length
     }
 
     return {

@@ -5,10 +5,10 @@ ALTER TABLE `point` DROP FOREIGN KEY `Point_routeId_fkey`;
 ALTER TABLE `team` DROP FOREIGN KEY `Team_routeId_fkey`;
 
 -- DropIndex
-DROP INDEX `Point_routeId_fkey` ON `point`;
+DROP INDEX `Point_routeId_fkey` ON `Point`;
 
 -- DropIndex
-DROP INDEX `Team_routeId_fkey` ON `team`;
+DROP INDEX `Team_routeId_fkey` ON `Team`;
 
 -- AddForeignKey
 ALTER TABLE `Point` ADD CONSTRAINT `Point_routeId_fkey` FOREIGN KEY (`routeId`) REFERENCES `Route`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
