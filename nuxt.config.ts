@@ -92,4 +92,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     dbUrl: process.env.DATABASE_URL, 
   },
+  image: {
+    domains: [
+      'www.why-city.ru'
+    ]
+  },
 })
