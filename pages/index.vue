@@ -19,12 +19,15 @@
         />
       </div>
 
+      <div v-if="currentRiddle" class="question-title">
+        Задание:
+      </div>
       <div v-if="currentRiddle" class="question-text">
         {{ currentRiddle.taskText || currentRiddle.title }}
       </div>
 
-      <!-- Аудио (если нужно) -->
       <audio
+        class="question-audio"
         v-if="currentRiddle?.filePath && currentRiddle.taskType === 'audio'"
         controls
       >
@@ -34,6 +37,7 @@
       <NuxtImg
         v-if="currentRiddle?.filePath && currentRiddle.taskType === 'image'"
         :src="currentRiddle.filePath"
+        class="question-image"
         alt="Task Image"
       />
 
@@ -175,25 +179,45 @@ async function submitAnswer() {
   }
 }
 
-const nextQuestion = () => {
-  if (isFinished.value) return;
+const nextQuestion = async () => {
+  if (isFinished.value || isAnswered.value) return;
 
-  currentStep.value++;
-  userAnswer.value = "";
-  attemptsLeft.value = maxAttempts;
-  showResult.value = false;
-  resultMessage.value = "";
-  isAnswered.value = false;
-  isInvalid.value = false;
+  try {
+    // Отправляем запрос на переход к следующему вопросу
+    const response = await $fetch('/api/quiz/next', {
+      method: 'POST',
+      body: {
+        teamId: teamId.value,
+        currentPoint: currentStep.value // или questions.value[currentStep.value].id
+      }
+    });
 
-  // SSR-compatible scroll
-  const scrollToTop = () => {
-    if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-  
-  nextTick(() => scrollToTop());
+    // Обновляем локальное состояние на основе ответа сервера
+    currentStep.value = response.newCurrentPoint;
+    isFinished.value = response.isFinished;
+    score.value = response.newScore || score.value;
+
+    // Сбрасываем состояние для нового вопроса
+    userAnswer.value = "";
+    attemptsLeft.value = maxAttempts;
+    showResult.value = false;
+    resultMessage.value = "";
+    isAnswered.value = false;
+    isInvalid.value = false;
+
+    // Прокрутка к верху страницы
+    nextTick(() => {
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+
+  } catch (error) {
+    console.error('Error moving to next question:', error);
+    // Обработка ошибок
+    isInvalid.value = true;
+    resultMessage.value = 'Произошла ошибка при переходе к следующему вопросу';
+  }
 };
 </script>
 
@@ -208,7 +232,8 @@ const nextQuestion = () => {
 
 <style scoped lang="scss">
 .quiz-page {
-  height: 100dvh;
+  position: relative;
+  width: 100%;
   padding: 2.4rem 1.6rem;
   background-color: #f9f9fb;
   display: flex;
@@ -236,12 +261,33 @@ const nextQuestion = () => {
     text-align: center;
   }
 
-  .question-text {
-    font-size: 2rem;
+  .question-title{
+    width: 100%;
     font-weight: 600;
+    font-size: clamp(.8rem, 5vw, 2rem);
     margin-bottom: 2.4rem;
-    text-align: center;
+    text-align: left;
     color: #333;
+  }
+
+  .question-text {
+    width: 100%;
+    font-size: clamp(.8rem, 5vw, 2rem);
+    margin-bottom: 2.4rem;
+    text-align: left;
+    color: #333;
+  }
+
+  .question-audio{
+    width: 100%;
+    margin-bottom: 2.4rem;
+  }
+
+  .question-image {
+    margin-bottom: 2.4rem;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
   }
 
   .question-location {

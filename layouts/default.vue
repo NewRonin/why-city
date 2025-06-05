@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="layout">
     <header class="quiz-header">
       <span class="score">{{ store.score }}$</span>
       <button v-if="store.password" class="logout-btn" @click="handleLogout">
@@ -26,10 +26,16 @@ const handleLogout = () => {
 </script>
 
 <style scoped lang="scss">
+.layout {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-between;
+    width: 100dvw;
+    min-height: 100dvh;
+    overflow: hidden;
+  }
+
 .quiz-header {
-  position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   padding: 1.2rem 1.6rem;
   font-size: 1.6rem;

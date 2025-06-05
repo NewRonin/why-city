@@ -44,7 +44,16 @@
         <label class="form-label">Текущая точка</label>
         <InputNumber 
           v-model="teamForm.currentPoint" 
-          :min="0" 
+          :min="1" 
+          inputClass="form-input"
+          class="number-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Счёт команды</label>
+        <InputNumber 
+          v-model="teamForm.score" 
           inputClass="form-input"
           class="number-input"
         />
@@ -78,7 +87,8 @@ const teamForm = ref({
   name: '',
   password: '',
   routeId: null,
-  currentPoint: 0
+  currentPoint: 1,
+  score: 0,
 })
 
 onMounted(async () => {
