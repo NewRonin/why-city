@@ -150,6 +150,7 @@
                 <div v-if="currentPoint.filePath" class="preview-image">
                   <NuxtImg 
                     v-if="loadedPreview"
+                    provider="static"
                     :src="currentPoint.filePath" 
                     alt="Preview" 
                     @error="loadedPreview = false"

@@ -18,6 +18,7 @@
         
         <form @submit.prevent="handleLogin" class="login-form">
           <Password 
+            provider="static"
             v-model="password"
             placeholder="Введите пароль"
             :feedback="false"

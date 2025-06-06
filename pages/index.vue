@@ -36,6 +36,7 @@
 
       <NuxtImg
         v-if="currentRiddle?.filePath && currentRiddle.taskType === 'image'"
+        provider="static"
         :src="currentRiddle.filePath"
         class="question-image"
         alt="Task Image"

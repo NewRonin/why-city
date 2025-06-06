@@ -118,11 +118,5 @@ export default defineNuxtConfig({
   },
   image: {
     domains: ['www.why-city.ru'],
-    alias: {
-      uploads: '/uploads',
-    },
-    provider: 'static',
-    staticFilename: '[name]-[hash][ext]',
-    dir: 'public',
   },
 })
