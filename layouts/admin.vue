@@ -21,6 +21,12 @@ function scrollToFooter() {
     setTimeout(() => scaleContacts.value = false, 4000)
   }
 }
+
+useHead({
+  bodyAttrs: {
+      class: 'body-light'
+    }
+})
 </script>
 
 <style scoped lang="scss">

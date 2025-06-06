@@ -235,7 +235,7 @@ const nextQuestion = async () => {
   position: relative;
   width: 100%;
   padding: 2.4rem 1.6rem;
-  background-color: #f9f9fb;
+  background-color: #232323; // base-black
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -245,10 +245,10 @@ const nextQuestion = async () => {
   .quiz-box {
     width: 100%;
     max-width: 90rem;
-    background-color: #fff;
+    background-color: #2e2e2e; // slightly lighter than base-black
     border-radius: 1.6rem;
     padding: 2.4rem 2rem;
-    box-shadow: 0 0.4rem 1.6rem rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0.4rem 1.6rem rgba(255, 255, 255, 0.05);
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -256,29 +256,29 @@ const nextQuestion = async () => {
 
   .step-counter {
     font-size: 1.6rem;
-    color: #888;
+    color: #cccccc;
     margin-bottom: 1.6rem;
     text-align: center;
   }
 
-  .question-title{
+  .question-title {
     width: 100%;
     font-weight: 600;
-    font-size: clamp(.8rem, 5vw, 2rem);
+    font-size: clamp(0.8rem, 5vw, 2rem);
     margin-bottom: 2.4rem;
     text-align: left;
-    color: #333;
+    color: #f5f5f5; // light white
   }
 
   .question-text {
     width: 100%;
-    font-size: clamp(.8rem, 5vw, 2rem);
+    font-size: clamp(0.8rem, 5vw, 2rem);
     margin-bottom: 2.4rem;
     text-align: left;
-    color: #333;
+    color: #f5f5f5;
   }
 
-  .question-audio{
+  .question-audio {
     width: 100%;
     margin-bottom: 2.4rem;
   }
@@ -288,6 +288,7 @@ const nextQuestion = async () => {
     width: 100%;
     height: auto;
     object-fit: contain;
+    border-radius: 0.8rem;
   }
 
   .question-location {
@@ -296,6 +297,7 @@ const nextQuestion = async () => {
     display: flex;
     flex-flow: column wrap;
     gap: 1.6rem;
+    color: #f5f5f5;
   }
 
   .input-wrapper {
@@ -311,6 +313,7 @@ const nextQuestion = async () => {
       font-size: 1.6rem;
       padding: 1rem 1.2rem;
       border-radius: 1rem;
+      border: 1px solid #555;
     }
 
     .p-button {
@@ -344,6 +347,7 @@ const nextQuestion = async () => {
     height: 2rem;
     margin-top: 1.2rem;
     font-weight: 500;
+    color: var(--light-white);
   }
 
   .quiz-finished {
@@ -351,6 +355,8 @@ const nextQuestion = async () => {
     font-size: 2rem;
     font-weight: 600;
     margin-top: 2rem;
+    color: var(--light-white);
   }
 }
 </style>
+

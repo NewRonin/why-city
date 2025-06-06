@@ -56,7 +56,7 @@ const handleLogout = () => {
   
   .score {
     font-weight: bold;
-    color: #4a6cf7;
+    color: var(--accent-hostel);
   }
   
   .logout-btn {
@@ -74,14 +74,16 @@ const handleLogout = () => {
       transform: scale(0.95);
     }
     
-    &:hover {
-      background: #f3f4f6;
-      color: #4a6cf7;
-    }
-    
     svg {
       display: block;
     }
   }
+}
+</style>
+
+<style lang="scss">
+
+.p-button {
+    color: white;
 }
 </style>

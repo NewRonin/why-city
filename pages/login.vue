@@ -1,7 +1,10 @@
 <template>
   <div class="login-page">
     <div v-if="!loginType" class="choose-type">
-      <h1>НАЧАТЬ ИГРУ</h1>
+      <NuxtImg
+        class="main-logo"
+        src="/questLogo.png">
+      </NuxtImg>
       <div class="button-wrapper">
         <Button label="Я участник" severity="primary" @click="enterPlayer" />
         <Button label="Я организатор" severity="secondary" outlined @click="enterAdmin" />
@@ -164,6 +167,7 @@ const handleAdminLogin = async () => {
     justify-content: center;
     align-items: center;
     padding: 4rem 2rem;
+    gap: 3rem;
 
     h1 {
       font-family: AKONY;
@@ -171,6 +175,12 @@ const handleAdminLogin = async () => {
       text-align: center;
       margin-bottom: 5rem;
       font-weight: 700;
+    }
+
+    .main-logo{
+      height: auto;
+      width: 100%;
+      object-fit: contain;
     }
 
     .button-wrapper {
@@ -198,7 +208,6 @@ const handleAdminLogin = async () => {
 .title {
   font-size: 2rem;
   margin-bottom: 2rem;
-  color: var(--text-primary);
 }
 
 .login-form {
@@ -224,7 +233,6 @@ const handleAdminLogin = async () => {
   color: var(--success);
   padding: 1rem;
   border-radius: 0.6rem;
-  background-color: rgba(0, 128, 0, 0.1);
 }
 
 .p-inputtext {
