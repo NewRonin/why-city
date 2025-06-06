@@ -7,7 +7,7 @@ import { pipeline } from 'node:stream/promises'
 import { Readable } from 'node:stream'
 import { useRuntimeConfig } from '#imports'
 
-const uploadDir = resolve(useRuntimeConfig().rootDir || process.cwd(), '.output/public/uploads')
+const uploadDir = resolve(useRuntimeConfig().rootDir || process.cwd(), 'public/uploads')
 
 // Создаем директорию, если не существует
 mkdirSync(uploadDir, { recursive: true })

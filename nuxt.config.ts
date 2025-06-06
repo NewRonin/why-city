@@ -41,6 +41,7 @@ export default defineNuxtConfig({
   ssr: true,
   devtools: { enabled: true },
   app: {
+    baseURL: '/',
     head: {
       charset: "utf-8",
       title: "WHY CITY",
@@ -111,10 +112,17 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     dbUrl: process.env.DATABASE_URL, 
+    public: {
+      uploadsBaseUrl: '/uploads',
+    },
   },
   image: {
-    domains: [
-      'www.why-city.ru'
-    ]
+    domains: ['www.why-city.ru'],
+    alias: {
+      uploads: '/uploads',
+    },
+    provider: 'static',
+    staticFilename: '[name]-[hash][ext]',
+    dir: 'public',
   },
 })
