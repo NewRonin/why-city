@@ -64,6 +64,7 @@ const deleteAdmin = async (id) => {
 
 <style scoped lang="scss">
 .admins-page {
+  width: 100%;
   max-width: 900px;
   margin: 0 auto;
   padding: 30px 20px;

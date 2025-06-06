@@ -62,6 +62,7 @@ const deleteRoute = async (id) => {
 
 <style scoped lang="scss">
 .route-builder {
+  width: 100%;
   max-width: 1100px;
   margin: 0 auto;
   padding: 30px 20px;

@@ -97,6 +97,7 @@ const saveAdmin = async () => {
 
 <style scoped lang="scss">
 .admin-edit-page {
+  width: 100%;
   max-width: 600px;
   margin: 0 auto;
   padding: 30px 20px;
