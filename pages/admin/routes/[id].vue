@@ -150,6 +150,7 @@
                 <div v-if="currentPoint.filePath" class="preview-image">
                   <img
                     v-if="loadedPreview"
+                    :key="currentPoint.filePath" 
                     :src="currentPoint.filePath" 
                     alt="Preview" 
                     @error="loadedPreview = false"
@@ -170,7 +171,7 @@
                   chooseLabel="Загрузить аудио"
                 />
                 <div v-if="currentPoint.filePath" class="preview-audio">
-                  <audio controls>
+                  <audio :key="currentPoint.filePath"  controls>
                     <source :src="currentPoint.filePath" type="audio/mpeg">
                   </audio>
                 </div>
