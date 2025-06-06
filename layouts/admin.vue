@@ -31,15 +31,16 @@ useHead({
 
 <style scoped lang="scss">
 .layout {
+  width: 100dvw;
   display: flex;
   flex-flow: column wrap;
-  justify-content: space-between;
+  justify-content: flex-start;
   width: 100dvw;
   min-height: 100dvh;
   overflow: hidden;
 }
 
 .content{
-  flex: 1;
+  width: 100%;
 }
 </style>

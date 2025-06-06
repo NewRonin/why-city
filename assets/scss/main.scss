@@ -70,6 +70,10 @@ li {
 
 .body-light {
   background: var(--background-white) !important;
+
+  .p-button-icon-only {
+    color: inherit !important;
+  }
 }
 
 .page-container{
