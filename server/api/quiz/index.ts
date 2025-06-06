@@ -39,6 +39,14 @@ export default defineEventHandler(async (event) => {
     if (!team) throw createError({ statusCode: 404, message: 'Team not found' })
 
     const currentPoint = team.route.points[team.currentPoint - 1]
+    const totalPoints = team.route.points.length;
+
+    if (team.currentPoint > totalPoints) {
+      await prisma.team.update({
+        where: { id: team.id },
+        data: { currentPoint: totalPoints },
+      });
+    }
 
     // Получить попытки по текущей точке
     let attemptsUsed = 0
@@ -54,11 +62,14 @@ export default defineEventHandler(async (event) => {
       attemptsUsed = attempt?.attempts || 0
     }
 
+    const isFinished = team.currentPoint >= totalPoints
+
     return {
       questions: team.route.points,
       currentPoint: team.currentPoint,
       score: team.score || 0,
-      attemptsUsed
+      attemptsUsed,
+      isFinished,
     }
   }
 

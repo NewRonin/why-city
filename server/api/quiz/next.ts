@@ -40,12 +40,19 @@ export default defineEventHandler(async (event) => {
 
     // Если это была последняя точка — квест завершён
     if (nextIndex >= points.length) {
-      return {
-        isFinished: true,
-        newCurrentPointOrder: currentOrder,
-        newScore: team.score,
-      };
+        // Обнуляем или фиксируем currentPoint на последней
+        await prisma.team.update({
+            where: { id: team.id },
+            data: { currentPoint: points.length },
+        });
+
+        return {
+            isFinished: true,
+            newCurrentPointOrder: currentOrder,
+            newScore: team.score,
+        };
     }
+
 
     // Обновляем у команды currentPoint на следующий по порядку
     await prisma.team.update({

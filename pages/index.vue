@@ -70,7 +70,7 @@
 
     <div v-else class="quiz-finished">
       🎉 Квест завершён! <br />
-      Ваш счёт: <strong>{{ score }}$</strong>
+      Ваш счёт: {{ store.score }}$
     </div>
 
     <div class="result-message">
@@ -112,9 +112,9 @@ onMounted(async () => {
 
     if (data?.questions?.length) {
       riddles.value = data.questions;
-      teamId.value = data.teamId;
       currentStep.value = data.currentPoint || 1;
-      score.value = data.score || 0;
+      store.score = data.score || 0;
+      isFinished.value = isFinished
       attemptsLeft.value = maxAttempts - (data.attemptsUsed || 0);
     } else {
       console.error("Нет данных вопросов");
@@ -154,7 +154,7 @@ async function submitAnswer() {
     });
 
     if (response?.isCorrect) {
-      resultMessage.value = currentRiddle.value.successMessage || `✅ Верно! +${response.newScore}`;
+      resultMessage.value = currentRiddle.value.successMessage || `✅ Верно! +${response.newScore}$`;
       score.value += response.newScore; // +=, не =
       isAnswered.value = true;
     } else {
@@ -338,17 +338,23 @@ const nextQuestion = async () => {
   .result-message {
     text-align: center;
     justify-self: flex-start;
-    font-size: 1.6rem;
     height: 2rem;
     margin-top: 1.2rem;
     font-weight: 500;
     color: var(--light-white);
+
+    * {
+      font-family: GTA;
+      font-weight: 400;
+      font-size: 1.6rem;
+    }
   }
 
   .quiz-finished {
+    font-family: GTA;
+    font-weight: 400;
+    font-size: clamp(2rem, 12vw, 10rem);
     text-align: center;
-    font-size: 2rem;
-    font-weight: 600;
     margin-top: 2rem;
     color: var(--light-white);
   }

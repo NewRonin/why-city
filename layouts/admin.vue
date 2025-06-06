@@ -38,6 +38,7 @@ useHead({
   width: 100dvw;
   min-height: 100dvh;
   overflow: hidden;
+  font-size: 1.2rem;
 }
 
 .content{
