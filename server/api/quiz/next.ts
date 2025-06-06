@@ -1,42 +1,65 @@
-import prisma from '../../utils/prisma'
+import prisma from "~/server/utils/prisma";
 
 export default defineEventHandler(async (event) => {
+  if (event.req.url?.endsWith("/api/quiz/next") && event.req.method === "POST") {
+    const body = await readBody(event);
+    const { teamId, currentPointOrder } = body;
 
-  if (event.method === 'POST') {
-   const body = await readBody(event);
-    const { teamId, currentPoint } = body;
-
-    if (!teamId || currentPoint === undefined) {
-      throw createError({ statusCode: 400, message: 'Missing required fields' });
+    if (!teamId || typeof currentPointOrder !== "number") {
+      throw createError({ statusCode: 400, statusMessage: "Invalid request data" });
     }
 
-    // Обновляем текущий вопрос команды
-    const team = await prisma.team.update({
+    // Получаем текущую команду
+    const team = await prisma.team.findUnique({
       where: { id: teamId },
-      data: {
-        currentPoint: currentPoint + 1
-      },
       include: {
         route: {
-          select: {
+          include: {
             points: {
-              select: {
-                id: true
-              }
-            }
-          }
-        }
-      }
+              orderBy: { order: "asc" },
+            },
+          },
+        },
+      },
     });
 
-    const isFinished = team.currentPoint > team.route.points.length;
+    if (!team) {
+      throw createError({ statusCode: 404, statusMessage: "Team not found" });
+    }
+
+    const points = team.route.points;
+
+    // Ищем индекс текущей точки по order
+    const currentIndex = points.findIndex(p => p.order === currentPointOrder);
+    if (currentIndex === -1) {
+      throw createError({ statusCode: 404, statusMessage: "Current point not found" });
+    }
+
+    const nextIndex = currentIndex + 1;
+
+    // Если это была последняя точка — квест завершён
+    if (nextIndex >= points.length) {
+      return {
+        isFinished: true,
+        newCurrentPointOrder: currentPointOrder,
+        newScore: team.score,
+      };
+    }
+
+    // Обновляем у команды currentPoint (уже по порядку)
+    await prisma.team.update({
+      where: { id: teamId },
+      data: {
+        currentPoint: points[nextIndex].order,
+      },
+    });
 
     return {
-      newCurrentPoint: team.currentPoint,
+      isFinished: false,
+      newCurrentPointOrder: points[nextIndex].order,
       newScore: team.score,
-      isFinished
     };
   }
 
-  throw createError({ statusCode: 405, message: 'Method not allowed' })
-})
+  throw createError({ statusCode: 405, statusMessage: "Method not allowed" });
+});

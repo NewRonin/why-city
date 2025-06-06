@@ -113,8 +113,9 @@ onMounted(async () => {
     if (data?.questions?.length) {
       riddles.value = data.questions;
       teamId.value = data.teamId;
-      currentStep.value = data.currentPoint || 1;
+      currentStep.value = data.order || 1;
       score.value = data.score || 0;
+      attemptsLeft.value = maxAttempts - (data.attemptsUsed || 0);
     } else {
       console.error("Нет данных вопросов");
       // Можно добавить редирект или сообщение об ошибке
@@ -140,64 +141,59 @@ const currentRiddle = computed(() => {
 });
 
 async function submitAnswer() {
-  if (!userAnswer.value.trim() || isAnswered.value || attemptsLeft.value <= 0 || !currentRiddle.value) return
+  if (!userAnswer.value.trim() || isAnswered.value || attemptsLeft.value <= 0 || !currentRiddle.value) return;
 
   try {
     const response = await $fetch("/api/quiz", {
+      query: { teamPassword: store.password },
       method: "POST",
       body: {
-        teamId: teamId.value,
         pointId: currentRiddle.value.id,
-        answer: userAnswer.value.trim(),
-        attempts: maxAttempts - attemptsLeft.value,
+        answer: userAnswer.value.trim()
       },
-    })
+    });
 
     if (response?.isCorrect) {
-      resultMessage.value = currentRiddle.value.successMessage || "✅ Верно! +" + response.newScore
-      score.value += response.newScore
-      isFinished.value = response.isFinished
-      isAnswered.value = true
-      
-      // Auto-advance if correct
-      if (!isFinished.value) {
-        setTimeout(nextQuestion, 1500)
-      }
+      resultMessage.value = currentRiddle.value.successMessage || `✅ Верно! +${response.newScore}`;
+      score.value += response.newScore; // +=, не =
+      isAnswered.value = true;
     } else {
-      attemptsLeft.value--
+      attemptsLeft.value--;
       resultMessage.value = attemptsLeft.value > 0
         ? `❌ Неверно. Осталось попыток: ${attemptsLeft.value}`
-        : `❌ Правильный ответ: ${response?.correctAnswer || currentRiddle.value.correctAnswer}`
+        : `❌ Правильный ответ: ${response?.correctAnswer || ''}`;
+      isInvalid.value = true;
     }
-    showResult.value = true
-    isInvalid.value = !response?.isCorrect
 
+    showResult.value = true;
   } catch (error) {
-    console.error("Ошибка:", error)
-    resultMessage.value = "Ошибка при отправке ответа"
-    showResult.value = true
+    console.error("Ошибка:", error);
+    resultMessage.value = "Ошибка при отправке ответа";
+    showResult.value = true;
+    isInvalid.value = true;
   }
 }
 
 const nextQuestion = async () => {
-  if (isFinished.value || isAnswered.value) return;
+  if (isFinished.value) return;
 
   try {
-    // Отправляем запрос на переход к следующему вопросу
-    const response = await $fetch('/api/quiz/next', {
-      method: 'POST',
+    const response = await $fetch("/api/quiz/next", {
+      method: "POST",
       body: {
-        teamId: teamId.value,
-        currentPoint: currentStep.value // или questions.value[currentStep.value].id
-      }
+        teamPassword: store.password
+      },
     });
 
-    // Обновляем локальное состояние на основе ответа сервера
-    currentStep.value = response.newCurrentPoint;
-    isFinished.value = response.isFinished;
+    if (response.isFinished) {
+      isFinished.value = true;
+      return;
+    }
+
+    currentStep.value = response.newCurrentPointOrder;
     score.value = response.newScore || score.value;
 
-    // Сбрасываем состояние для нового вопроса
+    // Сброс состояния
     userAnswer.value = "";
     attemptsLeft.value = maxAttempts;
     showResult.value = false;
@@ -205,20 +201,19 @@ const nextQuestion = async () => {
     isAnswered.value = false;
     isInvalid.value = false;
 
-    // Прокрутка к верху страницы
     nextTick(() => {
-      if (typeof window !== 'undefined') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
     });
-
   } catch (error) {
-    console.error('Error moving to next question:', error);
-    // Обработка ошибок
+    console.error("Ошибка при переходе к следующему вопросу:", error);
+    resultMessage.value = "Произошла ошибка при переходе к следующему вопросу";
     isInvalid.value = true;
-    resultMessage.value = 'Произошла ошибка при переходе к следующему вопросу';
   }
 };
+
+
 </script>
 
 <style scoped>

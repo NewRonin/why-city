@@ -26,7 +26,8 @@
           />
         </div>
         
-        <DataTable :value="routeForm.points" class="points-table" stripedRows>
+        <DataTable sortField="order" :value="routeForm.points" class="points-table" stripedRows>
+          <Column field="order" header="Порядок" style="width: 100px" />
           <Column field="title" header="Название"></Column>
           <Column field="address" header="Адрес" style="min-width: 200px"></Column>
           <Column header="Тип" style="width: 120px">
@@ -192,6 +193,28 @@
                   placeholder="Введите правильный ответ"
                 />
               </div>
+
+              <div class="form-checkbox">
+                <Checkbox 
+                  v-model="currentPoint.useCustomOrder" 
+                  :binary="true" 
+                  inputId="customOrder"
+                />
+                <label for="customOrder" style="margin-left: 8px">Указать порядок вручную</label>
+              </div>
+
+              <div 
+                class="form-group"
+                v-if="currentPoint.useCustomOrder"
+              >
+                <label>Порядок</label>
+                <InputNumber 
+                  v-model="currentPoint.order"
+                  :min="1"
+                  :step="1"
+                  showButtons
+                />
+              </div>
               
               <!-- <div class="form-group">
                 <label>Сообщение при успехе</label>
@@ -266,7 +289,8 @@ function createEmptyPoint() {
     correctAnswer: '',
     successMessage: '',
     fileSize: null,
-    mimeType: null
+    mimeType: null,
+    order: null,
   }
 }
 
@@ -329,18 +353,25 @@ const savePoint = () => {
   const savedPoint = { ...currentPoint.value }
   delete savedPoint.uploadedFile
 
-  if (currentPoint.value.id) {
-    const index = routeForm.value.points.findIndex(p => p.id === currentPoint.value.id)
+  if (!savedPoint.useCustomOrder || savedPoint.order == null) {
+    const maxOrder = routeForm.value.points.reduce(
+      (max, p) => Math.max(max, p.order || 0), 
+      0
+    )
+    savedPoint.order = maxOrder + 1
+  }
+
+  if (savedPoint.id) {
+    const index = routeForm.value.points.findIndex(p => p.id === savedPoint.id)
     routeForm.value.points[index] = savedPoint
   } else {
-    routeForm.value.points.push({
-      ...savedPoint,
-      id: Date.now()
-    })
+    savedPoint.id = Date.now()
+    routeForm.value.points.push(savedPoint)
   }
-  
+
   pointDialogVisible.value = false
 }
+
 
 const deletePoint = (id) => {
   if (confirm('Вы уверены, что хотите удалить эту точку?')) {
@@ -389,6 +420,13 @@ const onFileUpload = (event) => {
 }
 
 .form-group {
+  margin-bottom: 25px;
+}
+
+.form-checkbox {
+  display: flex;
+  flex-flow: row nowrap;
+  font-size: 1rem;
   margin-bottom: 25px;
 }
 

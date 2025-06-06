@@ -1,20 +1,21 @@
 import prisma from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  if (event.method === 'GET') {
-    const { teamPassword } = getQuery(event)
-    
-    if (!teamPassword) {
-      throw createError({ statusCode: 400, message: 'Password is required' })
-    }
+  const { teamPassword } = getQuery(event)
 
-    const team = await prisma.team.findUnique({
-      where: { password: teamPassword },
+  if (!teamPassword) {
+    throw createError({ statusCode: 400, message: 'Missing team password' })
+  }
+
+  // GET: получить текущее состояние
+  if (event.method === 'GET') {
+    const team = await prisma.team.findFirst({
+      where: { password: String(teamPassword) },
       include: {
         route: {
           include: {
             points: {
-              orderBy: { id: 'asc' },
+              orderBy: { order: 'asc' },
               select: {
                 id: true,
                 title: true,
@@ -26,7 +27,8 @@ export default defineEventHandler(async (event) => {
                 filePath: true,
                 fileSize: true,
                 mimeType: true,
-                successMessage: true
+                successMessage: true,
+                order: true
               }
             }
           }
@@ -34,70 +36,100 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    if (!team) {
-      throw createError({ statusCode: 404, message: 'Team not found' })
+    if (!team) throw createError({ statusCode: 404, message: 'Team not found' })
+
+    const currentPoint = team.route.points[team.currentPoint - 1]
+
+    // Получить попытки по текущей точке
+    let attemptsUsed = 0
+    if (currentPoint) {
+      const attempt = await prisma.attempt.findUnique({
+        where: {
+          teamId_pointId: {
+            teamId: team.id,
+            pointId: currentPoint.id
+          }
+        }
+      })
+      attemptsUsed = attempt?.attempts || 0
     }
 
     return {
       questions: team.route.points,
-      teamId: team.id,
       currentPoint: team.currentPoint,
-      score: team.score || 0
+      score: team.score || 0,
+      attemptsUsed
     }
   }
 
+  // POST: отправка ответа на текущую точку
   if (event.method === 'POST') {
     const body = await readBody(event)
-    const { teamId, pointId, answer, attempts } = body
+    const { pointId, answer } = body
 
-    if (!teamId || !pointId || !answer) {
+    if (!pointId || !answer) {
       throw createError({ statusCode: 400, message: 'Missing required fields' })
     }
 
-    // Get the point details
-    const point = await prisma.point.findUnique({
-      where: { id: pointId },
-      select: { correctAnswer: true }
+    const team = await prisma.team.findFirst({
+      where: { password: String(teamPassword) },
+      select: { id: true, currentPoint: true, routeId: true, score: true }
     })
 
-    if (!point) {
-      throw createError({ statusCode: 404, message: 'Point not found' })
+    if (!team) throw createError({ statusCode: 404, message: 'Team not found' })
+
+    const pointList = await prisma.point.findMany({
+      where: { routeId: team.routeId },
+      orderBy: { order: 'asc' }
+    })
+
+    const point = pointList[team.currentPoint - 1]
+
+    if (!point || point.id !== pointId) {
+      throw createError({ statusCode: 403, message: 'Invalid point access' })
     }
 
-    const isCorrect = answer.toLowerCase() === point.correctAnswer.toLowerCase()
-    let scoreIncrement = 0
-    let isFinished = false
+    // Обновляем/создаём попытку
+    const attempt = await prisma.attempt.upsert({
+      where: {
+        teamId_pointId: {
+          teamId: team.id,
+          pointId: pointId
+        }
+      },
+      update: { attempts: { increment: 1 } },
+      create: { teamId: team.id, pointId, attempts: 1 }
+    })
+
+    const isCorrect = answer.trim().toLowerCase() === point.correctAnswer.trim().toLowerCase()
 
     if (isCorrect) {
-      scoreIncrement = calculateScore(attempts)
-      
-      const team = await prisma.team.update({
-        where: { id: teamId },
+      const scoreIncrement = calculateScore(attempt.attempts)
+      const updatedTeam = await prisma.team.update({
+        where: { id: team.id },
         data: {
           score: { increment: scoreIncrement },
           currentPoint: { increment: 1 }
-        },
-        include: {
-          route: {
-            select: {
-              points: {
-                select: {
-                  id: true
-                }
-              }
-            }
-          }
         }
       })
 
-      isFinished = team.currentPoint > team.route.points.length
-    }
+      const isFinished = updatedTeam.currentPoint > pointList.length
 
-    return {
-      isCorrect,
-      correctAnswer: isCorrect ? point.correctAnswer : undefined,
-      newScore: scoreIncrement,
-      isFinished
+      return {
+        isCorrect: true,
+        newScore: scoreIncrement,
+        isFinished,
+        successMessage: point.successMessage || ''
+      }
+    } else {
+      const maxAttempts = 3
+      const used = attempt.attempts
+      return {
+        isCorrect: false,
+        newScore: 0,
+        correctAnswer: used >= maxAttempts ? point.correctAnswer : undefined,
+        isFinished: false
+      }
     }
   }
 
@@ -106,5 +138,5 @@ export default defineEventHandler(async (event) => {
 
 function calculateScore(attempts: number): number {
   const maxScore = 100
-  return Math.floor(maxScore / Math.pow(2, attempts))
+  return Math.floor(maxScore / Math.pow(2, attempts - 1))
 }
