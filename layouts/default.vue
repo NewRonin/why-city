@@ -17,6 +17,13 @@
 
 <script setup lang="ts">
 import { useMainStore } from '@/stores/main'
+
+useHead({
+  htmlAttrs: {
+    class: 'darkmode'
+  }
+})
+
 const store = useMainStore()
 
 const handleLogout = () => {
@@ -44,7 +51,7 @@ const handleLogout = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
+  background: var(--base-black);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   
   .score {

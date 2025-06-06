@@ -117,6 +117,7 @@
                   :min="-90" 
                   :max="90" 
                   :step="0.000001"
+                  :maxFractionDigits="6"
                 />
               </div>
               
@@ -128,6 +129,7 @@
                   :min="-180" 
                   :max="180" 
                   :step="0.000001"
+                  :maxFractionDigits="6"
                 />
               </div>
             </div>
@@ -192,7 +194,7 @@
                 />
               </div>
               
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <label>Сообщение при успехе</label>
                 <Textarea 
                   v-model="currentPoint.successMessage" 
@@ -200,7 +202,7 @@
                   rows="3" 
                   autoResize
                 />
-              </div>
+              </div> -->
             </div>
           </div>
         </div>

@@ -12,18 +12,12 @@
           <div class="admin-card-title">Команды</div>
           <div class="admin-card-desc">Добавление, редактирование и контроль команд</div>
         </div>
-
-        <div class="admin-card" @click="navigate('/admin/points')">
-          <div class="admin-card-title">Точки</div>
-          <div class="admin-card-desc">Управление контрольными точками и заданиями</div>
-        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
 const router = useRouter()
 
 function navigate(path: string) {

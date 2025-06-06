@@ -87,7 +87,7 @@ export default defineNuxtConfig({
       theme: {
           preset: CollabPreset,
           options: {
-              darkModeSelector: false || 'none',
+              darkModeSelector: '.darkmode',
           }
       }
     },
