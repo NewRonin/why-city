@@ -353,7 +353,7 @@ const savePoint = () => {
   const savedPoint = { ...currentPoint.value }
   delete savedPoint.uploadedFile
 
-  if (!savedPoint.useCustomOrder || savedPoint.order == null) {
+  if (!savedPoint.useCustomOrder && savedPoint.order == null) {
     const maxOrder = routeForm.value.points.reduce(
       (max, p) => Math.max(max, p.order || 0), 
       0
@@ -366,6 +366,7 @@ const savePoint = () => {
     routeForm.value.points[index] = savedPoint
   } else {
     savedPoint.id = Date.now()
+    delete savedPoint.useCustomOrder
     routeForm.value.points.push(savedPoint)
   }
 

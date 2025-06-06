@@ -113,7 +113,7 @@ onMounted(async () => {
     if (data?.questions?.length) {
       riddles.value = data.questions;
       teamId.value = data.teamId;
-      currentStep.value = data.order || 1;
+      currentStep.value = data.currentPoint || 1;
       score.value = data.score || 0;
       attemptsLeft.value = maxAttempts - (data.attemptsUsed || 0);
     } else {

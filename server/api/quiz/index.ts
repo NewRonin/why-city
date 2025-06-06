@@ -85,6 +85,8 @@ export default defineEventHandler(async (event) => {
 
     const point = pointList[team.currentPoint - 1]
 
+    console.log(team.currentPoint, point.correctAnswer)
+
     if (!point || point.id !== pointId) {
       throw createError({ statusCode: 403, message: 'Invalid point access' })
     }

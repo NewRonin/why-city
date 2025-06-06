@@ -3,15 +3,15 @@ import prisma from "~/server/utils/prisma";
 export default defineEventHandler(async (event) => {
   if (event.req.url?.endsWith("/api/quiz/next") && event.req.method === "POST") {
     const body = await readBody(event);
-    const { teamId, currentPointOrder } = body;
+    const { teamPassword } = body;
 
-    if (!teamId || typeof currentPointOrder !== "number") {
-      throw createError({ statusCode: 400, statusMessage: "Invalid request data" });
+    if (!teamPassword) {
+      throw createError({ statusCode: 400, statusMessage: "Missing team password" });
     }
 
-    // Получаем текущую команду
-    const team = await prisma.team.findUnique({
-      where: { id: teamId },
+    // Находим команду по паролю, включая маршрут и точки
+    const team = await prisma.team.findFirst({
+      where: { password: String(teamPassword) },
       include: {
         route: {
           include: {
@@ -28,9 +28,10 @@ export default defineEventHandler(async (event) => {
     }
 
     const points = team.route.points;
+    const currentOrder = team.currentPoint || points[0]?.order || 1;
 
-    // Ищем индекс текущей точки по order
-    const currentIndex = points.findIndex(p => p.order === currentPointOrder);
+    // Ищем индекс текущей точки по порядку
+    const currentIndex = points.findIndex(p => p.order === currentOrder);
     if (currentIndex === -1) {
       throw createError({ statusCode: 404, statusMessage: "Current point not found" });
     }
@@ -41,14 +42,14 @@ export default defineEventHandler(async (event) => {
     if (nextIndex >= points.length) {
       return {
         isFinished: true,
-        newCurrentPointOrder: currentPointOrder,
+        newCurrentPointOrder: currentOrder,
         newScore: team.score,
       };
     }
 
-    // Обновляем у команды currentPoint (уже по порядку)
+    // Обновляем у команды currentPoint на следующий по порядку
     await prisma.team.update({
-      where: { id: teamId },
+      where: { id: team.id },
       data: {
         currentPoint: points[nextIndex].order,
       },
