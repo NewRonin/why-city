@@ -55,7 +55,9 @@ const handleLogout = () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   
   .score {
-    font-weight: bold;
+    font-size: 4rem;
+    font-family: GTA;
+    font-weight: 100;
     color: var(--accent-hostel);
   }
   

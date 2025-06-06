@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
 
   // GET - Получение конкретного маршрута
   if (event.method === "GET") {
-    return await prisma.route.findUnique({
+    return await prisma.route.findUnique({  
       where: { id },
       include: { points: true },
     });

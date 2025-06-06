@@ -21,3 +21,11 @@
   font-weight: 600;
   font-style: normal;
 }
+
+@font-face {
+  font-family: 'GTA';
+  src: url('/assets/fonts/GTA-Russian.woff2') format('woff2'),
+  url('/assets/fonts/GTA-Russian.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}

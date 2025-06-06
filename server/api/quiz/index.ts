@@ -26,7 +26,6 @@ export default defineEventHandler(async (event) => {
                 filePath: true,
                 fileSize: true,
                 mimeType: true,
-                correctAnswer: true,
                 successMessage: true
               }
             }
@@ -96,7 +95,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       isCorrect,
-      correctAnswer: point.correctAnswer,
+      correctAnswer: isCorrect ? point.correctAnswer : undefined,
       newScore: scoreIncrement,
       isFinished
     }
