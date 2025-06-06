@@ -149,11 +149,9 @@
                 />
                 <div v-if="currentPoint.filePath" class="preview-image">
                   <img
-                    v-if="loadedPreview"
                     :key="currentPoint.filePath" 
                     :src="currentPoint.filePath" 
                     alt="Preview" 
-                    @error="loadedPreview = false"
                   />
                 </div>
               </div>
