@@ -34,9 +34,8 @@
         <source :src="currentRiddle.filePath" :type="currentRiddle.mimeType" />
       </audio>
 
-      <NuxtImg
+      <img
         v-if="currentRiddle?.filePath && currentRiddle.taskType === 'image'"
-        provider="static"
         :src="currentRiddle.filePath"
         class="question-image"
         alt="Task Image"

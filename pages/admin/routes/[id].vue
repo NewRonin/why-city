@@ -148,9 +148,8 @@
                   chooseLabel="Загрузить изображение"
                 />
                 <div v-if="currentPoint.filePath" class="preview-image">
-                  <NuxtImg 
+                  <img
                     v-if="loadedPreview"
-                    provider="static"
                     :src="currentPoint.filePath" 
                     alt="Preview" 
                     @error="loadedPreview = false"
