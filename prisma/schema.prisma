@@ -14,17 +14,21 @@ model Point {
   id               Int      @id @default(autoincrement())
   title            String
   address          String   @db.Text
-  latitude         Float    // Широта
-  longitude        Float    // Долгота
+  latitude         Float
+  longitude        Float
   taskType         TaskType
   taskText         String   @db.Text
-  filePath         String?  
-  fileSize         Int?     
-  mimeType         String?  
+  filePath         String?
+  fileSize         Int?
+  mimeType         String?
   correctAnswer    String
   successMessage   String   @db.Text
+  order            Int?
+
   route            Route?   @relation(fields: [routeId], references: [id])
   routeId          Int?
+
+  attempts         Attempt[]
 }
 
 model Route {
@@ -41,13 +45,28 @@ model Team {
   route            Route    @relation(fields: [routeId], references: [id])
   routeId          Int
   currentPoint     Int
-  score            Int      @default(0)      
+  score            Int      @default(0)
+
+  attempts         Attempt[]
 }
 
 model Admin {
   id        Int     @id @default(autoincrement())
   username  String  @unique
-  password  String  
+  password  String
+}
+
+model Attempt {
+  id        Int      @id @default(autoincrement())
+  teamId    Int
+  pointId   Int
+  attempts  Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  team      Team     @relation(fields: [teamId], references: [id])
+  point     Point    @relation(fields: [pointId], references: [id])
+
+  @@unique([teamId, pointId])
 }
 
 enum TaskType {
@@ -55,3 +74,4 @@ enum TaskType {
   image
   audio
 }
+
