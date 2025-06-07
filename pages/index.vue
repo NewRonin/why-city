@@ -69,13 +69,13 @@
     </div>
 
     <div v-else class="quiz-finished">
-  🎉 Квест завершён! <br />
+  <!-- 🎉 Квест завершён! <br />
       Ваш счёт: {{ store.score }}$
       <Button 
         label="Результаты" 
         @click="navigateToResults"
         class="results-button"
-      />
+      /> -->
     </div>
 
     <div class="result-message">
@@ -121,6 +121,10 @@ onMounted(async () => {
       store.score = data.score || 0;
       isFinished.value = data.isFinished
       attemptsLeft.value = maxAttempts - (data.attemptsUsed || 0);
+
+      if (isFinished) {
+        navigateTo('/final')
+      }
     } else {
       console.error("Нет данных вопросов");
       // Можно добавить редирект или сообщение об ошибке

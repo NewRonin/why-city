@@ -127,7 +127,6 @@ const getCardHeight = (position) => {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
   box-sizing: border-box;
 }
 
@@ -142,7 +141,7 @@ h2 {
   font-family: GTA;
   margin: 0 0 25px 0;
   text-align: center;
-  font-size: 5rem;
+  font-size: 4rem;
   font-weight: 500;
   letter-spacing: 1px;
 }
@@ -165,7 +164,7 @@ h2 {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   width: 95%;
   display: grid;
-  grid-template-columns: 50px 1fr 90px 90px;
+  grid-template-columns: 20px 1fr 90px 90px;
   align-items: center;
   overflow: hidden;
 }
@@ -246,23 +245,23 @@ h2 {
 
 /* Специальные стили для первых мест */
 .priority-1 {
-  .position-badge { width: 45px; height: 45px; font-size: 1.5rem; }
-  .score-value { font-size: 4rem; }
+  .position-badge { width: 20px; height: 20px; font-size: 1.5rem; }
+  .score-value { font-size: 3.6rem; }
 }
 
 .priority-2 {
-  .position-badge { width: 42px; height: 42px; font-size: 1.4rem; }
-  .score-value { font-size: 4rem; }
+  .position-badge { width: 20px; height: 20px; font-size: 1.4rem; }
+  .score-value { font-size: 3rem; }
 }
 
 .priority-3 {
-  .position-badge { width: 40px; height: 40px; font-size: 1.3rem; }
-  .score-value { font-size: 3.5rem; }
+  .position-badge { width: 20px; height: 20px; font-size: 1.3rem; }
+  .score-value { font-size: 2.4rem; }
 }
 
 @media (max-width: 768px) {
   .leaderboard-card {
-    grid-template-columns: 45px 1fr 70px 70px;
+    grid-template-columns: 20px 1fr 70px 70px;
     padding: 12px 15px;
     width: 98%;
   }
@@ -273,8 +272,8 @@ h2 {
   .priority-4 { height: 65px; font-size: 1.6rem }
   
   .position-badge {
-    width: 36px;
-    height: 36px;
+    width: 20px;
+    height: 20px;
     font-size: 1.1rem;
   }
   
@@ -285,12 +284,12 @@ h2 {
 
 @media (max-width: 480px) {
   .leaderboard-card {
-    grid-template-columns: 4.5rem 1fr 6rem 7rem;
+    grid-template-columns: 2rem 1fr 6rem 7rem;
     padding: 10px 12px;
     gap: 8px;
 
     .team-name{
-        font-size: 2rem;
+        font-size: 1.6rem;
     }
   }
   

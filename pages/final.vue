@@ -2,13 +2,22 @@
   <div class="party-page">
     <div class="party-container" :class="{ 'revealed': isRevealed }">
       <div class="party-content">
-        <h1 class="party-title">ГДЕ PARTY?</h1>
-        <Button 
-          label="Узнать" 
-          class="reveal-button" 
-          @click="revealLocation" 
-          :raised="true"
-        />
+        <h1 class="party-title">КВЕСТ ЗАВЕРШЁН</h1>
+        <div class="buttons-container">
+          <Button 
+            label="GDE PARTY?" 
+            severity="primary"
+            class="reveal-button" 
+            @click="revealLocation" 
+            :raised="true"
+          />
+          <Button 
+            label="Таблица лидеров" 
+            class="reveal-button" 
+            @click="revealLeaders" 
+            :raised="true"
+          />
+        </div>
       </div>
     </div>
 
@@ -46,6 +55,10 @@ const isRevealed = ref(false);
 
 const revealLocation = () => {
   isRevealed.value = true;
+};
+
+const revealLeaders = () => {
+  navigateTo('/leaders')
 };
 
 const hideLocation = () => {
@@ -100,9 +113,19 @@ const hideLocation = () => {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+.buttons-container {
+  display: flex;
+  flex-flow: column wrap;
+  width: 100%;
+  height: 100%;
+  gap: 1.6rem;
+}
+
 .reveal-button {
   font-size: 1.6rem;
+  width: 100%;
   padding: 1.5rem 3rem;
+  border-radius: 1rem;
   width: 100%;
   background-color: var(--light-white);
   color: var(--base-black);
@@ -186,11 +209,6 @@ const hideLocation = () => {
   
   .venue-title {
     font-size: clamp(1.6rem, 20vw, 5rem);
-  }
-  
-  .reveal-button, .hide-button {
-    font-size: 1.4rem;
-    padding: 0.8rem 1.6rem;
   }
 }
 </style>
