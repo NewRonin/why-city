@@ -53,6 +53,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       } : {},
     });
     store.setUser(response.name);
+    store.score = response.score;
   } catch (error) {
     store.clearPassword();
     return navigateTo('/login');

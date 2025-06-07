@@ -105,7 +105,6 @@ const resultMessage = ref("");
 const isAnswered = ref(false);
 const isInvalid = ref(false);
 const teamId = ref(null);
-const score = ref(0);
 const isFinished = ref(false);
 
 // Загрузка состояния
@@ -160,7 +159,7 @@ async function submitAnswer() {
 
     if (response?.isCorrect) {
       resultMessage.value = currentRiddle.value.successMessage || `✅ Верно! +${response.newScore}$`;
-      score.value += response.newScore; // +=, не =
+      store.score += response.newScore; // +=, не =
       isAnswered.value = true;
     } else {
       attemptsLeft.value--;
@@ -197,7 +196,7 @@ const nextQuestion = async () => {
     }
 
     currentStep.value = response.newCurrentPointOrder;
-    score.value = response.newScore || score.value;
+    store.score = response.newScore || store.score;
 
     // Сброс состояния
     userAnswer.value = "";
@@ -218,10 +217,6 @@ const nextQuestion = async () => {
     isInvalid.value = true;
   }
 };
-
-const navigateToResults = () => {
-  navigateTo('/final')
-}
 
 watch(isFinished, (newValue) => {
   if (newValue) {

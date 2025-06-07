@@ -1,7 +1,7 @@
 <template>
   <div class="layout">
     <header class="quiz-header">
-      <span class="score">{{ store.score }}$</span>
+      <span class="score">{{ animatedScore }}$</span>
       <button v-if="store.password" class="logout-btn" @click="handleLogout">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -27,14 +27,67 @@ useHead({
 })
 
 const store = useMainStore()
+const animatedScore = ref(0)
+let animationFrame: number | null = null
+
+// SSR-safe animation
+const animateScore = (newScore: number) => {
+  if (typeof window === 'undefined') return
+  
+  const duration = 1000 // 1 second
+  const startTime = performance.now()
+  const startValue = animatedScore.value
+  
+  const animate = (currentTime: number) => {
+    const elapsed = currentTime - startTime
+    const progress = Math.min(elapsed / duration, 1)
+    
+    animatedScore.value = Math.floor(startValue + (newScore - startValue) * progress)
+    
+    if (progress < 1) {
+      animationFrame = requestAnimationFrame(animate)
+    }
+  }
+  
+  if (animationFrame) {
+    cancelAnimationFrame(animationFrame)
+  }
+  
+  animationFrame = requestAnimationFrame(animate)
+}
+
+// Initialize and watch for score changes
+onMounted(() => {
+  animatedScore.value = store.score
+})
+
+watch(
+  () => store.score,
+  (newScore) => {
+    if (process.client) {
+      animateScore(newScore)
+    } else {
+      animatedScore.value = newScore
+    }
+  },
+  { immediate: true }
+)
 
 const handleLogout = () => {
   store.clearPassword()
   navigateTo('/login')
 }
+
+// Clean up animation frame
+onBeforeUnmount(() => {
+  if (animationFrame) {
+    cancelAnimationFrame(animationFrame)
+  }
+})
 </script>
 
 <style scoped lang="scss">
+/* Your existing styles remain unchanged */
 .layout {
     display: flex;
     flex-flow: column wrap;
@@ -65,6 +118,11 @@ const handleLogout = () => {
     font-family: GTA;
     font-weight: 100;
     color: var(--accent-hostel);
+    transition: transform 0.3s ease;
+    
+    &.animating {
+      transform: scale(1.1);
+    }
   }
   
   .logout-btn {
@@ -95,7 +153,6 @@ const handleLogout = () => {
 </style>
 
 <style lang="scss">
-
 .p-button {
     color: white;
 }
