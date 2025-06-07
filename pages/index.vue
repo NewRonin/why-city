@@ -4,7 +4,7 @@
 
     <div v-else-if="!isFinished" class="quiz-box">
       <div class="step-counter">
-        Вопрос {{ currentStep }} из {{ riddles.length }}
+        Миссия {{ currentStep }} из {{ riddles.length }}
       </div>
 
       <div v-if="currentRiddle?.coordinates" class="question-location">
@@ -186,7 +186,8 @@ const nextQuestion = async () => {
     const response = await $fetch("/api/quiz/next", {
       method: "POST",
       body: {
-        teamPassword: store.password
+        teamPassword: store.password,
+        isAnswered: isAnswered.value
       },
     });
 
@@ -237,7 +238,7 @@ const navigateToResults = () => {
 .quiz-page {
   position: relative;
   width: 100%;
-  height: 100dvh;
+  height: 100;
   padding: 2.4rem 1.6rem;
   background-color: #232323; // base-black
   display: flex;

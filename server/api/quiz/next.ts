@@ -3,7 +3,7 @@ import prisma from "~/server/utils/prisma";
 export default defineEventHandler(async (event) => {
   if (event.req.url?.endsWith("/api/quiz/next") && event.req.method === "POST") {
     const body = await readBody(event);
-    const { teamPassword } = body;
+    const { teamPassword, isAnswered } = body;
 
     if (!teamPassword) {
       throw createError({ statusCode: 400, statusMessage: "Missing team password" });
@@ -32,14 +32,10 @@ export default defineEventHandler(async (event) => {
 
     // Ищем индекс текущей точки по порядку
     const currentIndex = points.findIndex(p => p.order === currentOrder);
-    if (currentIndex === -1) {
-      throw createError({ statusCode: 404, statusMessage: "Current point not found" });
-    }
-
-    const nextIndex = currentIndex + 1;
+    const nextIndex = points.findIndex(p => p.order === currentOrder + 1);
 
     // Если это была последняя точка — квест завершён
-    if (nextIndex >= points.length) {
+    if (nextIndex === -1 || nextIndex >= points.length) {
         // Обнуляем или фиксируем currentPoint на последней
         await prisma.team.update({
             where: { id: team.id },
@@ -58,18 +54,22 @@ export default defineEventHandler(async (event) => {
 
 
     // Обновляем у команды currentPoint на следующий по порядку
-    await prisma.team.update({
-      where: { id: team.id },
-      data: {
-        currentPoint: points[nextIndex].order,
-      },
-    });
+    else {
+        if (!isAnswered) {
+            await prisma.team.update({
+            where: { id: team.id },
+            data: {
+                currentPoint: points[nextIndex].order,
+            },
+            });
+        }
 
-    return {
-      isFinished: false,
-      newCurrentPointOrder: points[nextIndex].order,
-      newScore: team.score,
-    };
+        return {
+            isFinished: false,
+            newCurrentPointOrder: isAnswered ? points[currentIndex].order : points[nextIndex].order,
+            newScore: team.score,
+        };
+    }
   }
 
   throw createError({ statusCode: 405, statusMessage: "Method not allowed" });

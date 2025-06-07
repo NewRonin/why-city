@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const currentPoint = team.route.points[team.currentPoint - 1]
+    const currentPoint = team.route.points.find(p => p.order === team.currentPoint);
     const totalPoints = team.route.points.length;
 
     if (team.currentPoint > totalPoints) {
