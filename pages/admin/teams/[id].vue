@@ -1,50 +1,56 @@
 <template>
   <div class="team-edit-page">
-    <Button 
-      icon="pi pi-arrow-left" 
+    <Button
+      icon="pi pi-arrow-left"
       class="p-button-text back-button"
       @click="navigateToTeamsList"
     />
-    
+
     <div class="edit-form">
-      <h2 class="form-title">{{ route.params.id === 'new' ? 'Создание команды' : 'Редактирование команды' }}</h2>
-      
+      <h2 class="form-title">
+        {{
+          route.params.id === "new"
+            ? "Создание команды"
+            : "Редактирование команды"
+        }}
+      </h2>
+
       <div class="form-group">
         <label class="form-label">Название команды</label>
-        <InputText 
-          v-model="teamForm.name" 
+        <InputText
+          v-model="teamForm.name"
           placeholder="Введите название"
           class="form-input"
         />
       </div>
-      
+
       <div class="form-group">
         <label class="form-label">Пароль</label>
-        <Password 
-          v-model="teamForm.password" 
+        <Password
+          v-model="teamForm.password"
           toggleMask
           inputClass="form-input"
           class="password-input"
         />
       </div>
-      
+
       <div class="form-group">
         <label class="form-label">Маршрут</label>
-        <Dropdown 
-          v-model="teamForm.routeId" 
-          :options="routes" 
-          optionLabel="routeNumber" 
+        <Dropdown
+          v-model="teamForm.routeId"
+          :options="routes"
+          optionLabel="routeNumber"
           optionValue="id"
           placeholder="Выберите маршрут"
           class="form-dropdown"
         />
       </div>
-      
+
       <div class="form-group">
         <label class="form-label">Текущая точка</label>
-        <InputNumber 
-          v-model="teamForm.currentPoint" 
-          :min="1" 
+        <InputNumber
+          v-model="teamForm.currentPoint"
+          :min="1"
           inputClass="form-input"
           class="number-input"
         />
@@ -52,21 +58,32 @@
 
       <div class="form-group">
         <label class="form-label">Счёт команды</label>
-        <InputNumber 
-          v-model="teamForm.score" 
+        <InputNumber
+          v-model="teamForm.score"
           inputClass="form-input"
           class="number-input"
         />
       </div>
-      
+
+      <div class="form-checkbox">
+        <Checkbox
+          v-model="resetAttempts"
+          :binary="true"
+          inputId="customOrder"
+        />
+        <label for="customOrder" style="margin-left: 8px"
+          >Ресет попыток</label
+        >
+      </div>
+
       <div class="form-actions">
-        <Button 
-          label="Отмена" 
+        <Button
+          label="Отмена"
           class="p-button-text cancel-btn"
           @click="navigateToTeamsList"
         />
-        <Button 
-          label="Сохранить" 
+        <Button
+          label="Сохранить"
           icon="pi pi-check"
           class="save-btn"
           @click="saveTeam"
@@ -77,53 +94,60 @@
 </template>
 
 <script setup>
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
+const resetAttempts = ref(false)
 
-const { data: routes } = useFetch('/api/routes')
+const { data: routes } = useFetch("/api/routes");
 
 const teamForm = ref({
   id: null,
-  name: '',
-  password: '',
+  name: "",
+  password: "",
   routeId: null,
   currentPoint: 1,
   score: 0,
-})
+});
 
 onMounted(async () => {
-  if (route.params.id !== 'new') {
+  if (route.params.id !== "new") {
     try {
-      const data = await $fetch(`/api/teams/${route.params.id}`)
-      teamForm.value = { ...data }
+      const data = await $fetch(`/api/teams/${route.params.id}`);
+      teamForm.value = { ...data };
     } catch (error) {
-      console.error('Ошибка при загрузке команды:', error)
+      console.error("Ошибка при загрузке команды:", error);
     }
   }
-})
+});
 
 const navigateToTeamsList = () => {
-  router.push('/admin/teams')
-}
+  router.push("/admin/teams");
+};
 
 const saveTeam = async () => {
   try {
     if (teamForm.value.id) {
       await $fetch(`/api/teams/${teamForm.value.id}`, {
-        method: 'PUT',
-        body: teamForm.value
-      })
+        method: "PUT",
+        body: teamForm.value,
+      });
     } else {
-      await $fetch('/api/teams', {
-        method: 'POST',
-        body: teamForm.value
-      })
+      await $fetch("/api/teams", {
+        method: "POST",
+        body: teamForm.value,
+      });
     }
-    navigateToTeamsList()
+
+    if (resetAttempts && teamForm.value.id) {
+      await $fetch(`/api/teams/resetAttempts?teamId=${teamForm.value.id}`, {
+        method: "POST",
+      });
+    }
+    navigateToTeamsList();
   } catch (error) {
-    console.error('Ошибка при сохранении команды:', error)
+    console.error("Ошибка при сохранении команды:", error);
   }
-}
+};
 </script>
 
 <style scoped lang="scss">
@@ -180,13 +204,20 @@ const saveTeam = async () => {
 
 /* Специальные настройки для Password */
 :deep(.p-password) {
-    display: flex;
-    width: 100%;
-    
-    .p-inputtext {
-      flex-grow: 1;
-    }
+  display: flex;
+  width: 100%;
+
+  .p-inputtext {
+    flex-grow: 1;
   }
+}
+
+.form-checkbox {
+  display: flex;
+  flex-flow: row nowrap;
+  font-size: 1rem;
+  margin-bottom: 25px;
+}
 
 .form-actions {
   display: flex;
@@ -201,7 +232,7 @@ const saveTeam = async () => {
   padding: 10px 20px;
   color: #718096;
   font-weight: 500;
-  
+
   &:hover {
     background-color: #f7fafc;
   }
@@ -217,17 +248,17 @@ const saveTeam = async () => {
   .edit-form {
     padding: 20px;
   }
-  
+
   .form-title {
     font-size: 20px;
     margin-bottom: 20px;
   }
-  
+
   .form-actions {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .cancel-btn,
   .save-btn {
     width: 100%;

@@ -129,11 +129,10 @@ export default defineEventHandler(async (event) => {
         where: { id: team.id },
         data: {
           score: { increment: scoreIncrement },
-          currentPoint: { increment: 1 }
         }
       })
 
-      const isFinished = updatedTeam.currentPoint > pointList.length
+      const isFinished = team.currentPoint + 1 > pointList.length
 
       return {
         isCorrect: true,

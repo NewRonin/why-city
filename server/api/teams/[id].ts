@@ -87,16 +87,28 @@ export default defineEventHandler(async (event) => {
   // DELETE /api/teams/[id]
   if (method === 'DELETE') {
     try {
-      await prisma.team.delete({ where: { id: teamId } })
+      // Delete related attempts first
+      await prisma.attempt.deleteMany({
+        where: { teamId },
+      })
+
+      // Now delete the team
+      await prisma.team.delete({
+        where: { id: teamId },
+      })
+
       return { success: true }
     } catch (error: any) {
+      console.error('Delete failed:', error)
+
       throw createError({
         statusCode: error.code === 'P2025' ? 404 : 500,
         statusMessage: 'Delete failed',
-        message: error.message || 'Could not delete team'
+        message: error.message || 'Could not delete team',
       })
     }
   }
+
 
   throw createError({
     statusCode: 405,

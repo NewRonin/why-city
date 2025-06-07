@@ -9,7 +9,6 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: "Missing team password" });
     }
 
-    // Находим команду по паролю, включая маршрут и точки
     const team = await prisma.team.findFirst({
       where: { password: String(teamPassword) },
       include: {
@@ -28,47 +27,64 @@ export default defineEventHandler(async (event) => {
     }
 
     const points = team.route.points;
-    const currentOrder = team.currentPoint || points[0]?.order || 1;
-
-    // Ищем индекс текущей точки по порядку
+    const currentOrder = team.currentPoint ?? points[0]?.order;
     const currentIndex = points.findIndex(p => p.order === currentOrder);
-    const nextIndex = points.findIndex(p => p.order === currentOrder + 1);
 
-    // Если это была последняя точка — квест завершён
-    if (nextIndex === -1 || nextIndex >= points.length) {
-        // Обнуляем или фиксируем currentPoint на последней
+    if (currentIndex === -1) {
+      throw createError({ statusCode: 500, statusMessage: "Invalid current point" });
+    }
+
+    const isLastPoint = currentIndex === points.length - 1;
+
+    if (isLastPoint) {
+      // Последняя точка
+      if (isAnswered) {
+        // Ответ получен — завершить квест
         await prisma.team.update({
-            where: { id: team.id },
-            data: {
-            currentPoint: points.length,
-            finishTime: new Date(), // Set finish time
-            },
+          where: { id: team.id },
+          data: {
+            finishTime: new Date(),
+          },
         });
 
         return {
-            isFinished: true,
-            newCurrentPointOrder: currentOrder,
-            newScore: team.score,
+          isFinished: true,
+          newCurrentPointOrder: currentOrder,
+          newScore: team.score,
         };
-    }
+      } else {
+        // Пока не отвечено — оставить на месте
+        return {
+          isFinished: false,
+          newCurrentPointOrder: currentOrder,
+          newScore: team.score,
+        };
+      }
+    } else {
+      // Не последняя точка — перейти к следующей после ответа
+      if (isAnswered) {
+        const nextPoint = points[currentIndex + 1];
 
-
-    // Обновляем у команды currentPoint на следующий по порядку
-    else {
-        if (!isAnswered) {
-            await prisma.team.update({
-            where: { id: team.id },
-            data: {
-                currentPoint: points[nextIndex].order,
-            },
-            });
-        }
+        await prisma.team.update({
+          where: { id: team.id },
+          data: {
+            currentPoint: nextPoint.order,
+          },
+        });
 
         return {
-            isFinished: false,
-            newCurrentPointOrder: isAnswered ? points[currentIndex].order : points[nextIndex].order,
-            newScore: team.score,
+          isFinished: false,
+          newCurrentPointOrder: nextPoint.order,
+          newScore: team.score,
         };
+      } else {
+        // Не отвечено — остаёмся на текущей
+        return {
+          isFinished: false,
+          newCurrentPointOrder: currentOrder,
+          newScore: team.score,
+        };
+      }
     }
   }
 
