@@ -34,12 +34,27 @@
         <source :src="currentRiddle.filePath" :type="currentRiddle.mimeType" />
       </audio>
 
-      <img
-        v-if="currentRiddle?.filePath && currentRiddle.taskType === 'image'"
-        :src="currentRiddle.filePath"
-        class="question-image"
-        alt="Task Image"
-      />
+      <div v-if="currentRiddle?.filePath && currentRiddle.taskType === 'image'" class="zoom-wrapper">
+        <img
+          v-if="currentRiddle?.filePath && currentRiddle.taskType === 'image'"
+          :src="currentRiddle.filePath"
+          class="question-image"
+          alt="Task Image"
+          @click="openImageZoom(currentRiddle.filePath)"
+        />
+      </div>
+
+      <div v-if="zoomedImage" class="zoom-overlay" @mousedown="closeZoom" @touchstart="closeZoom">
+        <div
+          ref="zoomContainer"
+          class="zoom-container"
+          @mousedown.stop
+          @touchstart.stop
+        >
+          <img :src="zoomedImage" class="zoomable-img" alt="Task Image" />
+        </div>
+      </div>
+
 
       <div class="input-wrapper">
         <InputText
@@ -87,12 +102,14 @@
 </template>
 
 <script setup lang="ts">
+import panzoom from 'panzoom';
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 import { useMainStore } from "@/stores/main";
 
 const store = useMainStore();
 const maxAttempts = 3;
+const zoomedImage = ref<string | null>(null);
 
 // Состояние загрузки
 const isLoading = ref(true);
@@ -106,6 +123,7 @@ const isAnswered = ref(false);
 const isInvalid = ref(false);
 const teamId = ref(null);
 const isFinished = ref(false);
+const zoomContainer = ref<HTMLElement | null>(null);
 
 // Загрузка состояния
 onMounted(async () => {
@@ -131,6 +149,15 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+function openImageZoom(src: string) {
+  zoomedImage.value = src;
+}
+
+function closeZoom() {
+  zoomedImage.value = null;
+}
+
 
 const currentRiddle = computed(() => {
   const riddle = riddles.value[currentStep.value - 1];
@@ -223,6 +250,22 @@ watch(isFinished, (newValue) => {
     navigateTo('/final');
   }
 });
+
+watch(zoomedImage, async (newSrc) => {
+  if (newSrc) {
+    await nextTick();
+    const el = zoomContainer.value?.querySelector('img.zoomable-img');
+    if (el) {
+      panzoom(el, {
+        maxZoom: 5,
+        minZoom: 1,
+        bounds: true,
+        boundsPadding: 0.1,
+      });
+    }
+  }
+});
+
 
 </script>
 
@@ -383,5 +426,59 @@ watch(isFinished, (newValue) => {
     }
   }
 }
+
+.zoom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  cursor: zoom-out;
+
+  .zoomed-img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 1rem;
+    box-shadow: 0 0 2rem rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease;
+  }
+}
+
+.zoom-wrapper {
+  width: 100%;
+  max-height: 60vh;
+  overflow: hidden;
+  border-radius: 1rem;
+  margin-bottom: 2.4rem;
+}
+
+.zoom-container {
+  max-width: 90vw;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  touch-action: none;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  img.zoomable-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    user-select: none;
+    pointer-events: none;
+  }
+}
+
+
 </style>
 

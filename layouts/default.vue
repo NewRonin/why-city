@@ -117,7 +117,7 @@ onBeforeUnmount(() => {
     font-size: 4rem;
     font-family: GTA;
     font-weight: 100;
-    color: var(--accent-hostel);
+    color: var(--hostel-400);
     transition: transform 0.3s ease;
     
     &.animating {
