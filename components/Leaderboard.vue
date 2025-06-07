@@ -10,43 +10,57 @@
       >
         <div class="position-badge">{{ team.position }}</div>
         <div class="team-name">{{ team.name }}</div>
-        <div class="time-value">{{ team.displayTime }}</div>
+        <div class="time-value">{{ team.time === 'In progress' ? '--:--' : team.displayTime }}</div>
         <div class="score-value">{{ team.displayScore }}$</div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
 import gsap from 'gsap'
 
-const teamsData = ref([
-  { id: 1, name: 'Пять с приветом', time: '12:34', score: 2450 },
-  { id: 2, name: 'пока без команды', time: '13:45', score: 1980 },
-  { id: 3, name: 'Gun done', time: '14:12', score: 1750 },
-  { id: 4, name: '321, поехали!', time: '15:30', score: 1200 },
-  { id: 5, name: 'Слепые котятки', time: '16:45', score: 950 },
-  { id: 6, name: 'Семьи с Гроув-стрит', time: '17:15', score: 800 },
-  { id: 7, name: '"Пчёлы ЮДАМП"', time: '18:20', score: 750 },
-  { id: 8, name: 'Команда З', time: '19:05', score: 600 },
-  { id: 9, name: 'Команда И', time: '20:30', score: 450 },
-  { id: 10, name: 'Команда К', time: '21:15', score: 300 },
-  { id: 11, name: 'Команда Л', time: '22:00', score: 200 }
-])
+const props = defineProps({
+  teams: {
+    type: Array,
+    required: true
+  }
+})
 
+const teamsData = ref([])
 const displayTeams = ref([])
 const cardRefs = ref([])
 
-const initDisplayTeams = () => {
-  return teamsData.value.map((team, index) => ({
-    ...team,
-    position: index + 1,
-    displayTime: '00:00',
-    displayScore: 0,
-    targetScore: team.score,
-    targetTimeValue: team.time.split(':').map(Number)[0] * 60 + team.time.split(':').map(Number)[1]
-  }))
+watch(
+  () => props.teams,
+  (newTeams) => {
+    teamsData.value = newTeams
+    displayTeams.value = initDisplayTeams()
+    nextTick(() => animateCards())
+  },
+  { immediate: true }
+)
+
+function initDisplayTeams() {
+  return teamsData.value.map((team) => {
+    let targetTimeValue = 0
+    
+    if (team.isFinished && team.time !== 'In progress') {
+      // Split MM:SS format
+      const [minutes, seconds] = team.time.split(':').map(Number)
+      targetTimeValue = minutes * 60 + seconds
+    }
+
+    return {
+      ...team,
+      displayTime: team.isFinished ? '00:00' : 'In progress',
+      displayScore: 0,
+      targetScore: team.score,
+      targetTimeValue,
+      // Keep original values
+      originalTime: team.time
+    }
+  })
 }
 
 const animateCards = () => {
@@ -81,45 +95,32 @@ const animateNumbers = () => {
       ease: "power2.out"
     })
 
-    const timeObj = { value: 0 }
-    gsap.to(timeObj, {
-      value: team.targetTimeValue,
-      duration: 1.5,
-      ease: "power2.out",
-      onUpdate: () => {
-        const minutes = Math.floor(timeObj.value / 60)
-        const seconds = Math.floor(timeObj.value % 60)
-        team.displayTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-      },
-      onComplete: () => {
-        team.displayTime = team.time
-      }
-    })
+    // Only animate time for finished teams
+    if (team.isFinished) {
+      const timeObj = { value: 0 }
+      gsap.to(timeObj, {
+        value: team.targetTimeValue,
+        duration: 1.5,
+        ease: "power2.out",
+        onUpdate: () => {
+          const minutes = Math.floor(timeObj.value / 60)
+          const seconds = Math.floor(timeObj.value % 60)
+          team.displayTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+        },
+        onComplete: () => {
+          team.displayTime = team.originalTime
+        }
+      })
+    }
   })
 }
 
 const getCardHeight = (position) => {
-  const heights = {
-    1: 110,  // Первое место
-    2: 100,  // Второе место
-    3: 90,   // Третье место
-    4: 80    // Остальные
-  }
+  const heights = { 1: 110, 2: 100, 3: 90, 4: 80 }
   return heights[Math.min(position, 4)] || heights[4]
 }
-
-const getCardWidth = (position) => {
-  // Динамический расчет ширины с приоритетом для первого места
-  const baseWidth = 100 - (teamsData.length - 1) * 2
-  const widthReduction = position > 1 ? (position - 1) * 1.5 : 0
-  return `calc(${Math.max(baseWidth - widthReduction, 70)}% - 20px)`
-}
-
-onMounted(() => {
-  displayTeams.value = initDisplayTeams()
-  setTimeout(() => animateCards(), 100)
-})
 </script>
+
 
 <style scoped lang="scss">
 .leaderboard-container {
@@ -238,7 +239,7 @@ h2 {
   color: var(--accent-color);
   font-family: GTA;
   font-weight: 300;
-  font-size: 3rem;
+  font-size: 3.5rem;
   transform: scale(1.1);
   transform-origin: right center;
 }
@@ -246,15 +247,17 @@ h2 {
 /* Специальные стили для первых мест */
 .priority-1 {
   .position-badge { width: 45px; height: 45px; font-size: 1.5rem; }
-  .score-value { font-size: 3rem; }
+  .score-value { font-size: 4rem; }
 }
 
 .priority-2 {
   .position-badge { width: 42px; height: 42px; font-size: 1.4rem; }
+  .score-value { font-size: 4rem; }
 }
 
 .priority-3 {
   .position-badge { width: 40px; height: 40px; font-size: 1.3rem; }
+  .score-value { font-size: 3.5rem; }
 }
 
 @media (max-width: 768px) {
@@ -282,12 +285,12 @@ h2 {
 
 @media (max-width: 480px) {
   .leaderboard-card {
-    grid-template-columns: 45px 1fr 60px 70px;
+    grid-template-columns: 4.5rem 1fr 6rem 7rem;
     padding: 10px 12px;
     gap: 8px;
 
     .team-name{
-        font-size: 1.6rem;
+        font-size: 2rem;
     }
   }
   

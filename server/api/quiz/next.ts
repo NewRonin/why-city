@@ -43,7 +43,10 @@ export default defineEventHandler(async (event) => {
         // Обнуляем или фиксируем currentPoint на последней
         await prisma.team.update({
             where: { id: team.id },
-            data: { currentPoint: points.length },
+            data: {
+            currentPoint: points.length,
+            finishTime: new Date(), // Set finish time
+            },
         });
 
         return {

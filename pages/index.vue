@@ -114,7 +114,7 @@ onMounted(async () => {
       riddles.value = data.questions;
       currentStep.value = data.currentPoint || 1;
       store.score = data.score || 0;
-      isFinished.value = isFinished
+      isFinished.value = data.isFinished
       attemptsLeft.value = maxAttempts - (data.attemptsUsed || 0);
     } else {
       console.error("Нет данных вопросов");

@@ -38,6 +38,13 @@ export default defineEventHandler(async (event) => {
 
     if (!team) throw createError({ statusCode: 404, message: 'Team not found' })
 
+    if (!team.startTime) {
+      await prisma.team.update({
+        where: { id: team.id },
+        data: { startTime: new Date() },
+      });
+    }
+
     const currentPoint = team.route.points[team.currentPoint - 1]
     const totalPoints = team.route.points.length;
 
