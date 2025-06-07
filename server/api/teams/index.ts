@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
   }
   
   if (method === 'POST') {
-    const { name, password, routeId } = await readBody(event)
+    const { name, password, routeId, currentPoint } = await readBody(event)
     
     if (!name || !password || !routeId) {
       throw createError({ 
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
           name,
           password,
           routeId: Number(routeId),
-          currentPoint: 0
+          currentPoint: currentPoint || 1
         }
       })
     } catch (error) {
