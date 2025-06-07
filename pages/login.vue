@@ -30,10 +30,19 @@
           <Button type="submit" class="login-button" severity="primary" :disabled="isLoading">
             {{ isLoading ? 'Загрузка...' : 'Войти' }}
           </Button>
+
+          <Button 
+            class="login-button"
+            label="Назад" 
+            severity="secondary" 
+            outlined 
+            @click="goBack"
+          />
           
           <div v-if="errorMessage" class="error-message">
             {{ errorMessage }}
           </div>
+
         </form>
       </div>
     </div>
@@ -54,7 +63,7 @@
           
           <Password 
             v-model="adminPassword"
-            placeholder="Введите пароль организатора"
+            placeholder="Введите пароль"
             :feedback="false"
             toggleMask
             inputClass="w-full"
@@ -65,6 +74,14 @@
           <Button type="submit" class="login-button" severity="primary" :disabled="isLoading">
             {{ isLoading ? 'Загрузка...' : 'Войти' }}
           </Button>
+
+          <Button 
+            label="Назад" 
+            severity="secondary" 
+            outlined 
+            @click="goBack"
+            class="login-button"
+          />
           
           <div v-if="errorMessage" class="error-message">
             {{ errorMessage }}
@@ -150,6 +167,14 @@ const handleAdminLogin = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+const goBack = () => {
+  loginType.value = undefined
+  errorMessage.value = ''
+  password.value = ''
+  adminUsername.value = ''
+  adminPassword.value = ''
 }
 </script>
 
@@ -244,6 +269,7 @@ const handleAdminLogin = async () => {
 // Стили для компонента Password
 :deep(.p-password) {
   width: 100%;
+  margin-bottom: 3.2rem;
   
   .p-password-input {
     width: 100%;

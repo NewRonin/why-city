@@ -69,8 +69,13 @@
     </div>
 
     <div v-else class="quiz-finished">
-      🎉 Квест завершён! <br />
+  🎉 Квест завершён! <br />
       Ваш счёт: {{ store.score }}$
+      <Button 
+        label="Результаты" 
+        @click="navigateToResults"
+        class="results-button"
+      />
     </div>
 
     <div class="result-message">
@@ -213,6 +218,9 @@ const nextQuestion = async () => {
   }
 };
 
+const navigateToResults = () => {
+  navigateTo('/leaders')
+}
 
 </script>
 
@@ -229,6 +237,7 @@ const nextQuestion = async () => {
 .quiz-page {
   position: relative;
   width: 100%;
+  height: 100dvh;
   padding: 2.4rem 1.6rem;
   background-color: #232323; // base-black
   display: flex;
@@ -357,6 +366,19 @@ const nextQuestion = async () => {
     text-align: center;
     margin-top: 2rem;
     color: var(--light-white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4rem;
+
+    .results-button {
+      width: 100%;
+      height: 5rem;
+      font-size: 1.6rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
   }
 }
 </style>
