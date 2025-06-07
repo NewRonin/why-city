@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 500, statusMessage: "Invalid current point" });
     }
 
-    const isLastPoint = currentIndex === points.length - 1;
+    const isLastPoint = currentIndex === points.length;
 
     if (isLastPoint) {
       // Последняя точка
