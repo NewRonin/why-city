@@ -2,6 +2,7 @@ import prisma from '../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   try {
+    // First fetch all teams with their route numbers
     const teams = await prisma.team.findMany({
       include: {
         route: {
@@ -9,29 +10,20 @@ export default defineEventHandler(async (event) => {
             routeNumber: true
           }
         }
-      },
-      orderBy: [
-        { score: 'desc' } // Primary sort by score
-      ]
+      }
     })
 
-    // In your API endpoint
-    const leaderboard = teams.map((team) => {
-      let formattedTimeTaken = 'In progress'
+    // Process and prepare data for sorting
+    const leaderboard = teams.map(team => {
       let isFinished = false
-      let rawTime = Infinity
+      let timeTakenMs = Infinity // Default high value for unfinished teams
+      let formattedTime = 'In progress'
 
       if (team.startTime && team.finishTime) {
-        const timeTakenMs = new Date(team.finishTime).getTime() - new Date(team.startTime).getTime()
         isFinished = true
-        rawTime = timeTakenMs
-        
+        timeTakenMs = new Date(team.finishTime).getTime() - new Date(team.startTime).getTime()
         const totalSeconds = Math.floor(timeTakenMs / 1000)
-        const minutes = Math.floor(totalSeconds / 60)
-        const seconds = totalSeconds % 60
-        
-        // Always format as MM:SS for consistency
-        formattedTimeTaken = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+        formattedTime = `${Math.floor(totalSeconds / 60).toString().padStart(2, '0')}:${(totalSeconds % 60).toString().padStart(2, '0')}`
       }
 
       return {
@@ -40,28 +32,31 @@ export default defineEventHandler(async (event) => {
         routeNumber: team.route.routeNumber,
         currentPoint: team.currentPoint,
         score: team.score,
-        time: formattedTimeTaken, // Will be either "MM:SS" or "In progress"
+        time: formattedTime,
         isFinished,
-        rawTime
+        timeTakenMs,
+        rawScore: team.score // Using rawScore for consistent sorting
       }
     })
-    // Final sorting - finished teams first (by time then score), then unfinished (by score)
     .sort((a, b) => {
-      // Both teams finished - sort by time then score
-      if (a.isFinished && b.isFinished) {
-        if (a.rawTime !== b.rawTime) {
-          return a.rawTime - b.rawTime
-        }
-        return b.score - a.score
+      // First sort by score (descending)
+      if (a.rawScore !== b.rawScore) {
+        return b.rawScore - a.rawScore
       }
-      // Only one team finished - finished comes first
+      
+      // If scores are equal, sort by time (finished teams first, then by time)
+      if (a.isFinished && b.isFinished) {
+        return a.timeTakenMs - b.timeTakenMs
+      }
+      
+      // If only one is finished, it comes first
       if (a.isFinished !== b.isFinished) {
         return a.isFinished ? -1 : 1
       }
-      // Both unfinished - sort by score
-      return b.score - a.score
+      
+      // Both unfinished with same score - maintain original order
+      return 0
     })
-    // Add positions after final sorting
     .map((team, index) => ({
       ...team,
       position: index + 1
