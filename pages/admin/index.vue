@@ -12,6 +12,11 @@
           <div class="admin-card-title">Команды</div>
           <div class="admin-card-desc">Добавление, редактирование и контроль команд</div>
         </div>
+
+        <div class="admin-card" @click="navigate('/admin/features')">
+          <div class="admin-card-title"> Фичер флаги </div>
+          <div class="admin-card-desc">Включение и отключение фич</div>
+        </div>
       </div>
     </div>
   </div>

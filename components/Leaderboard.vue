@@ -1,20 +1,22 @@
 <template>
-  <div class="leaderboard-container dark-theme">
-    <h2>Таблица лидеров</h2>
-    <div class="leaderboard-cards">
-      <div 
-        v-for="(team, index) in displayTeams" 
-        :key="team.id"
-        :class="['leaderboard-card', `priority-${Math.min(index + 1, 4)}`]"
-        :ref="el => cardRefs[index] = el"
-      >
-        <div class="position-badge">{{ team.position }}</div>
-        <div class="team-name">{{ team.name }}</div>
-        <div class="time-value">{{ team.time === 'In progress' ? '--:--' : team.displayTime }}</div>
-        <div class="score-value">{{ team.displayScore }}$</div>
-      </div>
+  <ClientOnly>
+    <div class="leaderboard-container dark-theme">
+        <h2>Таблица лидеров</h2>
+        <div class="leaderboard-cards">
+        <div 
+            v-for="(team, index) in displayTeams" 
+            :key="team.id"
+            :class="['leaderboard-card', `priority-${Math.min(index + 1, 4)}`]"
+            :ref="el => cardRefs[index] = el"
+        >
+            <div class="position-badge">{{ team.position }}</div>
+            <div class="team-name">{{ team.name }}</div>
+            <div class="time-value">{{ team.time === 'In progress' ? '--:--' : team.displayTime }}</div>
+            <div class="score-value">{{ team.displayScore }}$</div>
+        </div>
+        </div>
     </div>
-  </div>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
