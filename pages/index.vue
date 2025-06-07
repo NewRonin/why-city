@@ -243,8 +243,8 @@ watch(isFinished, (newValue) => {
 <style scoped lang="scss">
 .quiz-page {
   position: relative;
-  width: 100%;
-  height: 100;
+  width: 100dvw;
+  height: 100%;
   padding: 2.4rem 1.6rem;
   background-color: #232323; // base-black
   display: flex;

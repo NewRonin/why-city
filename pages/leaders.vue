@@ -28,7 +28,7 @@ const teams = data.value?.data || []
 <style scoped>
 .page-leaders {
   width: 100%;
-  max-width: 1200px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 20px;
 }

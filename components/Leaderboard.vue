@@ -209,9 +209,9 @@ h2 {
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: 1.6rem;
   font-weight: 800;
-  font-size: 1.2em;
+  font-size: 1.2rem;
   background: #3a3a3a;
 }
 
@@ -220,6 +220,7 @@ h2 {
   white-space: wrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
   padding-right: 10px;
 }
 
@@ -238,7 +239,7 @@ h2 {
   color: var(--accent-color);
   font-family: GTA;
   font-weight: 300;
-  font-size: 3.5rem;
+  font-size: 2rem;
   transform: scale(1.1);
   transform-origin: right center;
 }
@@ -259,6 +260,12 @@ h2 {
   .score-value { font-size: 2.4rem; }
 }
 
+.position-badge {
+    width: 20px;
+    height: 20px;
+    font-size: 1.1rem;
+  }
+
 @media (max-width: 768px) {
   .leaderboard-card {
     grid-template-columns: 20px 1fr 70px 70px;
@@ -270,12 +277,6 @@ h2 {
   .priority-2 { height: 80px; font-size: 2rem }
   .priority-3 { height: 75px; font-size: 1.8rem }
   .priority-4 { height: 65px; font-size: 1.6rem }
-  
-  .position-badge {
-    width: 20px;
-    height: 20px;
-    font-size: 1.1rem;
-  }
   
   .time-value {
     padding-right: 10px;

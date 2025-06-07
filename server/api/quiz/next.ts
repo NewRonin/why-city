@@ -39,12 +39,13 @@ export default defineEventHandler(async (event) => {
           where: { id: team.id },
           data: {
             finishTime: new Date(),
+            currentPoint: currentOrder + 1,
           },
         });
       }
         return {
           isFinished: true,
-          newCurrentPointOrder: currentOrder,
+          newCurrentPointOrder: currentOrder + 1,
           newScore: team.score,
         }
     } else {
