@@ -46,6 +46,8 @@ model Team {
   routeId          Int
   currentPoint     Int
   score            Int      @default(0)
+  startTime        DateTime?
+  finishTime       DateTime?  
 
   attempts         Attempt[]
 }

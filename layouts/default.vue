@@ -36,7 +36,7 @@ const handleLogout = () => {
 .layout {
     display: flex;
     flex-flow: column wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
     width: 100dvw;
     min-height: 100dvh;
     overflow: hidden;
