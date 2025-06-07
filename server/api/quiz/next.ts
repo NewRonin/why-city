@@ -28,9 +28,9 @@ export default defineEventHandler(async (event) => {
 
     const points = team.route.points;
     const currentOrder = team.currentPoint ?? points[0]?.order;
-    const currentIndex = currentOrder + 1;
+    const currentIndex = currentOrder;
 
-    const isLastPoint = currentIndex === points.length + 1;
+    const isLastPoint = clientPoint === points.length;
 
     if (isLastPoint) {
       // Последняя точка
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
         }
     } else {
       // Не последняя точка — перейти к следующей после ответа
-      const nextPoint = points[clientPoint < currentOrder ? currentIndex : currentIndex + 1];
+      const nextPoint = points[clientPoint < currentOrder ? currentIndex - 1 : currentIndex];
 
         await prisma.team.update({
           where: { id: team.id },

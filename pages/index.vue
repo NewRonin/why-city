@@ -78,7 +78,7 @@
       /> -->
     </div>
 
-    <div class="result-message">
+    <div v-if="!isFinished" class="result-message">
       <div :style="{ visibility: showResult ? 'visible' : 'hidden' }">
         {{ resultMessage }}
       </div>
@@ -121,10 +121,6 @@ onMounted(async () => {
       store.score = data.score || 0;
       isFinished.value = data.isFinished
       attemptsLeft.value = maxAttempts - (data.attemptsUsed || 0);
-
-      if (isFinished.value) {
-        navigateTo('/final')
-      }
     } else {
       console.error("Нет данных вопросов");
       // Можно добавить редирект или сообщение об ошибке
@@ -226,6 +222,12 @@ const nextQuestion = async () => {
 const navigateToResults = () => {
   navigateTo('/final')
 }
+
+watch(isFinished, (newValue) => {
+  if (newValue) {
+    navigateTo('/final');
+  }
+});
 
 </script>
 
