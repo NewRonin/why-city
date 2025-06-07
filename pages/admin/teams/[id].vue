@@ -65,6 +65,17 @@
         />
       </div>
 
+      <div class="form-group">
+        <label class="form-label">Время команды</label>
+        <DatePicker 
+          v-model="teamForm.finishTime" 
+          iconDisplay="input" 
+          timeOnly
+          :showSeconds="true"
+          hourFormat="24"
+        ></DatePicker>
+      </div>
+
       <div class="form-checkbox">
         <Checkbox
           v-model="resetAttempts"
@@ -107,6 +118,7 @@ const teamForm = ref({
   routeId: null,
   currentPoint: 1,
   score: 0,
+  finishTime: null,
 });
 
 onMounted(async () => {
@@ -130,6 +142,9 @@ const saveTeam = async () => {
       await $fetch(`/api/teams/${teamForm.value.id}`, {
         method: "PUT",
         body: teamForm.value,
+        finishTime: teamForm.value.finishTime
+        ? new Date(`1970-01-01T${teamForm.value.finishTime}`)
+        : null
       });
     } else {
       await $fetch("/api/teams", {
@@ -138,7 +153,7 @@ const saveTeam = async () => {
       });
     }
 
-    if (resetAttempts && teamForm.value.id) {
+    if (resetAttempts.value && teamForm.value.id) {
       await $fetch(`/api/teams/resetAttempts?teamId=${teamForm.value.id}`, {
         method: "POST",
       });

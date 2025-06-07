@@ -48,13 +48,6 @@ export default defineEventHandler(async (event) => {
     const currentPoint = team.route.points.find(p => p.order === team.currentPoint);
     const totalPoints = team.route.points.length;
 
-    if (team.currentPoint > totalPoints) {
-      await prisma.team.update({
-        where: { id: team.id },
-        data: { currentPoint: totalPoints },
-      });
-    }
-
     // Получить попытки по текущей точке
     let attemptsUsed = 0
     if (currentPoint) {
@@ -69,7 +62,16 @@ export default defineEventHandler(async (event) => {
       attemptsUsed = attempt?.attempts || 0
     }
 
-    const isFinished = team.currentPoint >= totalPoints
+    const isFinished = team.currentPoint > totalPoints
+
+    if (isFinished && !team.finishTime) {
+        await prisma.team.update({
+          where: { id: team.id },
+          data: {
+            finishTime: new Date(),
+          },
+        });
+      }
 
     return {
       questions: team.route.points,
@@ -129,16 +131,26 @@ export default defineEventHandler(async (event) => {
         where: { id: team.id },
         data: {
           score: { increment: scoreIncrement },
+          currentPoint: { increment: 1},
         }
       })
 
-      const isFinished = team.currentPoint + 1 > pointList.length
+      const isFinished = team.currentPoint > pointList.length
+
+      if (isFinished && !team.finishTime) {
+        await prisma.team.update({
+          where: { id: team.id },
+          data: {
+            finishTime: new Date(),
+          },
+        });
+      }
 
       return {
         isCorrect: true,
         newScore: scoreIncrement,
         isFinished,
-        successMessage: point.successMessage || ''
+        successMessage: point.successMessage || '',
       }
     } else {
       const maxAttempts = 3

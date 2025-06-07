@@ -187,7 +187,7 @@ const nextQuestion = async () => {
       method: "POST",
       body: {
         teamPassword: store.password,
-        isAnswered: isAnswered.value
+        clientPoint: currentStep.value,
       },
     });
 
