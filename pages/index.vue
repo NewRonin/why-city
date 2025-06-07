@@ -122,7 +122,7 @@ onMounted(async () => {
       isFinished.value = data.isFinished
       attemptsLeft.value = maxAttempts - (data.attemptsUsed || 0);
 
-      if (isFinished) {
+      if (isFinished.value) {
         navigateTo('/final')
       }
     } else {
