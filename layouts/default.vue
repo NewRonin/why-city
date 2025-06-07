@@ -11,7 +11,9 @@
       </button>
     </header>
 
-    <slot />
+    <div class="page-content">
+      <slot />
+    </div>
   </div>
 </template>
 
@@ -43,7 +45,11 @@ const handleLogout = () => {
   }
 
 .quiz-header {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 7rem;
   padding: 1.2rem 1.6rem;
   font-size: 1.6rem;
   font-weight: 600;
@@ -81,6 +87,11 @@ const handleLogout = () => {
     }
   }
 }
+
+.page-content{
+    padding-top: 7rem;
+    height: 100%;
+  }
 </style>
 
 <style lang="scss">

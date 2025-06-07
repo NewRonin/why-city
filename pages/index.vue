@@ -220,7 +220,7 @@ const nextQuestion = async () => {
 };
 
 const navigateToResults = () => {
-  navigateTo('/leaders')
+  navigateTo('/final')
 }
 
 </script>
