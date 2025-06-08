@@ -1,7 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 import Aura from '@primeuix/themes/aura';
-import PrimeVue from 'primevue/config';
 import { definePreset } from '@primeuix/themes';
 
 const CollabPreset = definePreset(Aura, {

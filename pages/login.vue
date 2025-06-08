@@ -1,109 +1,111 @@
 <template>
   <div class="login-page">
-    <div v-if="!loginType" class="choose-type">
-      <NuxtImg
-        class="main-logo"
-        src="/questLogo.png">
-      </NuxtImg>
-      <div class="button-wrapper">
-        <Button label="Я участник" severity="primary" @click="enterPlayer" />
-        <Button label="Я организатор" severity="secondary" outlined @click="enterAdmin" />
+     <div class="login-content">
+      <div v-if="!loginType" class="choose-type">
+        <NuxtImg
+          class="main-logo"
+          src="/questLogo.png">
+        </NuxtImg>
+        <div class="button-wrapper">
+          <Button label="Я участник" severity="primary" @click="enterPlayer" />
+          <Button label="Я организатор" severity="secondary" outlined @click="enterAdmin" />
+        </div>
       </div>
-    </div>
 
-    <!-- Форма для участника -->
-    <div v-else-if="loginType === 'user'">
-      <div class="login-container">
-        <h1 class="title">Вход для команды</h1>
-        
-        <form @submit.prevent="handleLogin" class="login-form">
-          <Password 
-            v-model="password"
-            placeholder="Введите пароль"
-            :feedback="false"
-            toggleMask
-            inputClass="w-full"
-            :inputStyle="{ 'font-size': '1.6rem', padding: '1.5rem' }"
-            required
-          />
+      <!-- Форма для участника -->
+      <div v-else-if="loginType === 'user'">
+        <div class="login-container">
+          <h1 class="title">Вход для команды</h1>
           
-          <Button type="submit" class="login-button" severity="primary" :disabled="isLoading">
-            {{ isLoading ? 'Загрузка...' : 'Войти' }}
-          </Button>
+          <form @submit.prevent="handleLogin" class="login-form">
+            <Password 
+              v-model="password"
+              placeholder="Введите пароль"
+              :feedback="false"
+              toggleMask
+              inputClass="w-full"
+              :inputStyle="{ 'font-size': '1.6rem', padding: '1.5rem' }"
+              required
+            />
+            
+            <Button type="submit" class="login-button" severity="primary" :disabled="isLoading">
+              {{ isLoading ? 'Загрузка...' : 'Войти' }}
+            </Button>
 
-          <Button 
-            class="login-button"
-            label="Назад" 
-            severity="secondary" 
-            outlined 
-            @click="goBack"
-          />
-          
-          <div v-if="errorMessage" class="error-message">
-            {{ errorMessage }}
-          </div>
+            <Button 
+              class="login-button"
+              label="Назад" 
+              severity="secondary" 
+              outlined 
+              @click="goBack"
+            />
+            
+            <div v-if="errorMessage" class="error-message">
+              {{ errorMessage }}
+            </div>
 
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
 
-    <!-- Форма для организатора -->
-    <div v-else-if="loginType === 'admin'">
-      <div class="login-container">
-        <h1 class="title">Вход для организатора</h1>
-        
-        <form @submit.prevent="handleAdminLogin" class="login-form">
-          <InputText
-            v-model="adminUsername"
-            placeholder="Введите логин"
-            class="w-full mb-3"
-            :inputStyle="{ 'font-size': '1.6rem', padding: '1.5rem' }"
-            required
-          />
+      <!-- Форма для организатора -->
+      <div v-else-if="loginType === 'admin'">
+        <div class="login-container">
+          <h1 class="title">Вход для организатора</h1>
           
-          <Password 
-            v-model="adminPassword"
-            placeholder="Введите пароль"
-            :feedback="false"
-            toggleMask
-            inputClass="w-full"
-            :inputStyle="{ 'font-size': '1.6rem', padding: '1.5rem' }"
-            required
-          />
-          
-          <Button type="submit" class="login-button" severity="primary" :disabled="isLoading">
-            {{ isLoading ? 'Загрузка...' : 'Войти' }}
-          </Button>
+          <form @submit.prevent="handleAdminLogin" class="login-form">
+            <InputText
+              v-model="adminUsername"
+              placeholder="Введите логин"
+              class="w-full mb-3"
+              :inputStyle="{ 'font-size': '1.6rem', padding: '1.5rem' }"
+              required
+            />
+            
+            <Password 
+              v-model="adminPassword"
+              placeholder="Введите пароль"
+              :feedback="false"
+              toggleMask
+              inputClass="w-full"
+              :inputStyle="{ 'font-size': '1.6rem', padding: '1.5rem' }"
+              required
+            />
+            
+            <Button type="submit" class="login-button" severity="primary" :disabled="isLoading">
+              {{ isLoading ? 'Загрузка...' : 'Войти' }}
+            </Button>
 
-          <Button 
-            label="Назад" 
-            severity="secondary" 
-            outlined 
-            @click="goBack"
-            class="login-button"
-          />
-          
-          <div v-if="errorMessage" class="error-message">
-            {{ errorMessage }}
-          </div>
-        </form>
+            <Button 
+              label="Назад" 
+              severity="secondary" 
+              outlined 
+              @click="goBack"
+              class="login-button"
+            />
+            
+            <div v-if="errorMessage" class="error-message">
+              {{ errorMessage }}
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+     </div>
+     <div class="login-footer">
+        <ClientOnly>
+          <div class="container-logo" v-show="!isKeyboardOpen">
 
-    <div class="container-logo">
+            <NuxtImg class="img-logo" src="/logo-white-collab.svg" />
+            <NuxtImg class="img-logo" src="/logo-white-hostel.svg" />
 
-      <NuxtImg class="img-logo" src="/logo-white-collab.svg" />
-      <NuxtImg class="img-logo" src="/logo-white-hostel.svg" />
-
-    </div>
+        </div>
+        </ClientOnly>
+     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useMainStore } from '@/stores/main'
-import { useInputHack } from '~/utils/useInputHack'
-
-useInputHack()
 const store = useMainStore()
 
 const loginType = ref<'user' | 'admin'>()
@@ -113,6 +115,7 @@ const adminPassword = ref('')
 const teamName = ref('')
 const errorMessage = ref('')
 const isLoading = ref(false)
+const isKeyboardOpen = ref(false)
 
 function enterPlayer() {
   loginType.value = 'user'
@@ -186,6 +189,26 @@ const goBack = () => {
   adminUsername.value = ''
   adminPassword.value = ''
 }
+
+// Telegram Web Bug Handle
+let initialInnerHeight = 0
+onMounted(() => {
+  // Сохраняем исходную высоту окна
+  initialInnerHeight = window.innerHeight
+
+  const handleResize = () => {
+    // Если высота сильно уменьшилась — клавиатура открыта
+    const diff = initialInnerHeight - window.innerHeight
+    isKeyboardOpen.value = diff > 150 // Порог в px: регулируется
+  }
+
+  window.addEventListener('resize', handleResize)
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', handleResize)
+  })
+})
+
 </script>
 
 <style scoped lang="scss">
@@ -293,14 +316,13 @@ const goBack = () => {
 
 .container-logo{
   position: absolute;
-  top: calc(100dvh - 190px);
+  bottom: 0;
   left: 0;
   display: flex;
   flex-flow: row wrap;
   width: 100%;
   justify-content: center;
   align-items: center;
-  padding: 4rem 2rem;
   gap: 4rem;
 
   .img-logo{
