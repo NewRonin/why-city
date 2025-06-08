@@ -33,7 +33,7 @@
           />
           <YandexLink
             :coordinates="[56.326756, 43.994888]"
-            address="Почаинская ул.,17с, Нижний Новгород"
+            address="ул. Почаинская, 17с, Нижний Новгород"
             class="address-link"
           />
         </div>
@@ -253,7 +253,7 @@ const hideLocation = () => {
 .venue-title {
   font-family: GTA;
   font-weight: 400;
-  font-size: clamp(1.8rem, 8vw, 6rem);
+  font-size: clamp(1.8rem, 8dvw, 6rem);
   margin-bottom: 2.4rem;
   color: var(--light-white);
   text-align: center;
@@ -265,7 +265,7 @@ const hideLocation = () => {
 .venue-subtitle {
   font-family: GTA;
   font-weight: 400;
-  font-size: clamp(1.2rem, 8vw, 4rem);
+  font-size: clamp(1.8rem, 8dvw, 4rem);
   margin-bottom: 2.4rem;
   color: var(--light-white);
   text-align: center;
@@ -367,6 +367,10 @@ const hideLocation = () => {
   
   .venue-title {
     font-size: clamp(1.6rem, 20vw, 5rem);
+  }
+
+  .venue-subtitle {
+    font-size: clamp(1.6rem, 16dvw, 4rem);
   }
 }
 </style>
