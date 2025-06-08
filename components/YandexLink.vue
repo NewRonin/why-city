@@ -31,7 +31,7 @@
         }
 
         .container-link {
-            color: var(--main);
+            color: var(--hostel-100);
         }
     }
 </style>

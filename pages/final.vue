@@ -24,6 +24,7 @@
     <div class="location-container" :class="{ 'active': isRevealed }">
       <div class="location-content">
         <h1 class="venue-title">ALCATRAZ BAR</h1>
+        <h2 class="venue-subtitle">19:00</h2>
         <div class="location-info">
           <YandexMap
             :coordinates="[56.326756, 43.994888]"
@@ -87,7 +88,6 @@ const hideLocation = () => {
   align-items: center;
   height: 100dvh;
   padding: 2.4rem 1.6rem;
-  background-color: var(--hostel-400);
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   
   &.revealed {
@@ -119,6 +119,14 @@ const hideLocation = () => {
   width: 100%;
   height: 100%;
   gap: 1.6rem;
+
+  .reveal-button:first-child {
+    :deep(span) {
+      font-size: 4rem;
+      font-weight: 400;
+      font-family: GTA;
+    }
+  }
 }
 
 .reveal-button {
@@ -127,8 +135,6 @@ const hideLocation = () => {
   padding: 1.5rem 3rem;
   border-radius: 1rem;
   width: 100%;
-  background-color: var(--light-white);
-  color: var(--base-black);
 }
 
 .location-container {
@@ -143,6 +149,10 @@ const hideLocation = () => {
   justify-content: center;
   align-items: center;
   background-color: var(--base-black);
+  background: url('final.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
   transform: translateY(100%);
   opacity: 0;
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -172,6 +182,17 @@ const hideLocation = () => {
   text-transform: uppercase;
 }
 
+.venue-subtitle {
+  font-family: GTA;
+  font-weight: 400;
+  font-size: clamp(1.2rem, 8vw, 4rem);
+  margin-bottom: 2.4rem;
+  color: var(--light-white);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+
 .location-info {
   margin-bottom: 2.4rem;
   
@@ -189,7 +210,7 @@ const hideLocation = () => {
   width: 100%;
   font-size: 1.6rem;
   padding: 1rem;
-  color: var(--main) !important;
+  color: var(--hostel-400)
 }
 
 @media (max-width: 768px) {
