@@ -94,9 +94,11 @@ const goBack = () => navigateTo('/')
 /* Стили остаются без изменений */
 .page-leaders {
   width: 100%;
+  height: 100%;
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
+  padding-bottom: 190px;
 }
 
 .login-button {
