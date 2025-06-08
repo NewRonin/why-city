@@ -27,6 +27,13 @@
         outlined 
         @click="goBack"
       />
+
+    <div class="container-logo">
+
+      <NuxtImg class="img-logo" src="/logo-white-collab.svg" />
+      <NuxtImg class="img-logo" src="/logo-white-hostel.svg" />
+
+    </div>
   </div>
 </template>
 
@@ -148,6 +155,29 @@ const goBack = () => navigateTo('/')
   
   .timer-label {
     font-size: 1.6rem;
+  }
+}
+
+.container-logo{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-flow: row wrap;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2rem;
+  gap: 4rem;
+
+  .img-logo{
+    width: 30%;
+    max-width: 90px;
+    height: auto;
+    max-height: 9rem;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
   }
 }
 </style>
