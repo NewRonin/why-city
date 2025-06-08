@@ -3,6 +3,10 @@ import { useMainStore } from "@/stores/main";
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const store = useMainStore();
   store.loadPasswordFromCookie();
+
+  const allowedPages = [
+    '/leaders'
+  ]
   
   // Страница логина - особый случай
   if (to.path === '/login') {
@@ -40,7 +44,12 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
   // Обычные роуты (не админские)
   if (!store.password) {
-    return navigateTo('/login');
+    if (allowedPages.includes(to.path) !== true) {
+      return navigateTo('/login');
+    }
+    else {
+      return
+    }
   }
 
   // Проверяем валидность пароля пользователя

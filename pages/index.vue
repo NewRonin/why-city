@@ -324,6 +324,8 @@ watch(zoomedImage, async (newSrc) => {
     font-size: clamp(0.8rem, 5vw, 2rem);
     margin-bottom: 2.4rem;
     text-align: left;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
     color: #f5f5f5;
   }
 
