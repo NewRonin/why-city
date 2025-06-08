@@ -208,7 +208,7 @@ const hideLocation = () => {
   justify-content: center;
   align-items: center;
   background-color: var(--base-black);
-  background: url('final.png');
+  background: url('/public/final.png');
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
