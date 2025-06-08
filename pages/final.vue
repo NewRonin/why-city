@@ -27,6 +27,7 @@
         <h2 class="venue-subtitle">19:00</h2>
         <div class="location-info">
           <YandexMap
+            class="map"
             :coordinates="[56.326756, 43.994888]"
             :zoom="18"
             placemark-text="GDE PARTY"
@@ -202,6 +203,7 @@ const hideLocation = () => {
   left: 0;
   width: 100%;
   height: 100%;
+  max-height: 100dvh;
   padding: 2.4rem 1.6rem;
   display: flex;
   flex-direction: column;
@@ -236,6 +238,7 @@ const hideLocation = () => {
   .location-content {
     max-width: 90rem;
     width: 100%;
+    max-height: 100dvh;
     background-color: rgba(46, 46, 46, 0.9);
     border-radius: 1.6rem;
     padding: 2.4rem;
@@ -243,6 +246,8 @@ const hideLocation = () => {
     backdrop-filter: blur(10px);
     transform: scale(0.95);
     transition: transform 0.4s ease;
+    display: flex;
+    flex-flow: column wrap;
     
     .active & {
       transform: scale(1);
@@ -355,8 +360,8 @@ const hideLocation = () => {
     margin-bottom: 2rem;
   }
   
-  .location-info .map {
-    height: 40rem;
+  .map {
+    max-height: 30dvh;
   }
 }
 

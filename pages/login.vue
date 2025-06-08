@@ -101,6 +101,9 @@
 
 <script setup lang="ts">
 import { useMainStore } from '@/stores/main'
+import { useInputHack } from '~/utils/useInputHack'
+
+useInputHack()
 const store = useMainStore()
 
 const loginType = ref<'user' | 'admin'>()
@@ -187,11 +190,12 @@ const goBack = () => {
 
 <style scoped lang="scss">
 .login-page {
-  min-height: 100dvh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
   
   .choose-type {
     display: flex;
@@ -289,7 +293,7 @@ const goBack = () => {
 
 .container-logo{
   position: absolute;
-  top: calc(100% - 170px);
+  top: calc(100dvh - 190px);
   left: 0;
   display: flex;
   flex-flow: row wrap;
