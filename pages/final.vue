@@ -45,17 +45,58 @@
         />
       </div>
     </div>
+
+    <canvas ref="confettiCanvas" class="confetti-canvas"></canvas>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import Button from "primevue/button";
+import confetti from 'canvas-confetti';
 
 const isRevealed = ref(false);
+const confettiCanvas = ref<HTMLCanvasElement | null>(null);
 
 const revealLocation = () => {
   isRevealed.value = true;
+  
+  // Запускаем анимации
+  setTimeout(() => {
+    fireConfetti();
+  }, 600); // После начала анимации перехода
+};
+
+const fireConfetti = () => {
+  if (confettiCanvas.value) {
+    const myConfetti = confetti.create(confettiCanvas.value, {
+      resize: true,
+      useWorker: true
+    });
+
+    myConfetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+    
+    // Дополнительные эффекты
+    setTimeout(() => {
+      myConfetti({
+        particleCount: 100,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 }
+      });
+      
+      myConfetti({
+        particleCount: 100,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 }
+      });
+    }, 300);
+  }
 };
 
 const revealLeaders = () => {
@@ -99,6 +140,8 @@ const hideLocation = () => {
     text-align: center;
     max-width: 90rem;
     width: 100%;
+    position: relative;
+    z-index: 2;
   }
 }
 
@@ -111,6 +154,12 @@ const hideLocation = () => {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transform: translateY(0);
+  transition: transform 0.4s ease;
+  
+  .revealed & {
+    transform: translateY(-20px);
+  }
 }
 
 .buttons-container {
@@ -125,6 +174,11 @@ const hideLocation = () => {
       font-size: 4rem;
       font-weight: 400;
       font-family: GTA;
+      transition: all 0.3s ease;
+    }
+    
+    &:hover {
+      transform: scale(1.02);
     }
   }
 }
@@ -135,6 +189,11 @@ const hideLocation = () => {
   padding: 1.5rem 3rem;
   border-radius: 1rem;
   width: 100%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:active {
+    transform: scale(0.98);
+  }
 }
 
 .location-container {
@@ -160,15 +219,34 @@ const hideLocation = () => {
   &.active {
     transform: translateY(0);
     opacity: 1;
+    
+    .venue-title {
+      animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+    
+    .venue-subtitle {
+      animation: fadeInUp 0.6s ease 0.3s both;
+    }
+    
+    .location-info {
+      animation: fadeIn 0.8s ease 0.5s both;
+    }
   }
   
   .location-content {
     max-width: 90rem;
     width: 100%;
-    background-color: #2e2e2e;
+    background-color: rgba(46, 46, 46, 0.9);
     border-radius: 1.6rem;
     padding: 2.4rem;
-    box-shadow: 0 0.4rem 1.6rem rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0.4rem 1.6rem rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transform: scale(0.95);
+    transition: transform 0.4s ease;
+    
+    .active & {
+      transform: scale(1);
+    }
   }
 }
 
@@ -180,6 +258,8 @@ const hideLocation = () => {
   color: var(--light-white);
   text-align: center;
   text-transform: uppercase;
+  transform: scale(0.8);
+  opacity: 0;
 }
 
 .venue-subtitle {
@@ -190,11 +270,13 @@ const hideLocation = () => {
   color: var(--light-white);
   text-align: center;
   text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(20px);
 }
-
 
 .location-info {
   margin-bottom: 2.4rem;
+  opacity: 0;
   
   .address-link {
     font-size: 1.6rem;
@@ -203,6 +285,11 @@ const hideLocation = () => {
     display: block;
     text-align: center;
     margin-top: 1.6rem;
+    color: var(--light-white);
+    
+    &:hover {
+      color: var(--hostel-400);
+    }
   }
 }
 
@@ -210,7 +297,57 @@ const hideLocation = () => {
   width: 100%;
   font-size: 1.6rem;
   padding: 1rem;
-  color: var(--hostel-400)
+  color: var(--hostel-400);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 768px) {
