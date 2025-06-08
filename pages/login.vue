@@ -289,7 +289,7 @@ const goBack = () => {
 
 .container-logo{
   position: absolute;
-  bottom: 0;
+  top: calc(100% - 170px);
   left: 0;
   display: flex;
   flex-flow: row wrap;
